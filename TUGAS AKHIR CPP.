@@ -1,10 +1,20 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 struct petugas{
 	string idpetugas;
 	string username;
 	string password;
 	string nama;
+};
+//ini masih input ptugas
+void tambahpetugas(){
+    petugas p;
+    cout<<"masukkan id\n";
+    cin>>p.idpetugas;
+    cout<<"masukkan username";
+    cin>>p.username;
+    cout<<"masukkan password";
+    cin>>p.password;
 }
-
