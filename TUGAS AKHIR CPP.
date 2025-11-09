@@ -8,7 +8,7 @@ struct petugas{
 	string password;
 	string nama;
 };
-//ini masih input ptugas
+//ini masih input petugas
 void tambahpetugas(){
     petugas p;
     cout<<"masukkan id\n";
@@ -18,3 +18,54 @@ void tambahpetugas(){
     cout<<"masukkan password";
     cin>>p.password;
 }
+
+ofstream file("petugas.txt", ios::app);
+if (file.is_open()) {
+    file << p.idpetugas << "," << p.username << "," << p.password << "," << p.nama << endl;
+    file close ();
+    cout << "Data anggota berhasil disimpan\n";
+} else {
+     cout << "Gagal membuka file\n" ;
+}
+
+struct anggota {
+    string idAnggota;
+    string kodeAnggota;
+    string nama;
+    string alamat;
+    string ttl; //tempat, tanggal, lahir
+    string email;
+    int status; //1 = aktif, 0 = tidak aktif
+};
+void tambahAnggota(){
+    Anggota a;
+    cout << "Masukkan ID Anggota (6 digit): " ;
+    cin >> a.idAnggota;
+    cout << "Masukkan Kode Anggota (11 digit): " ;
+    cin >> a.kodeAnggota;
+    cout << "Masukkan Nama: " ;
+    cin.ignore();
+    getline(cin, a.nama);
+    cout << "Masukkan Alamat: " ;
+    getline(cin, a.alamat);
+    cout << "Masukkan Tempat, Tanggal Lahir: " ;
+    getline(cin, a.ttl);
+    cout << "Masukkan Email: " ;
+    cin >> a.email;
+    cout << "Status (1 = aktif, 0 = tidak aktif): " ;
+    cin >> a.status;
+
+ofstream file("anggota.txt", ios::app);
+if (file.is_open()) {
+    file << a.idAnggota << "," << a.kodeAnggota << "," << a.nama << "," << a.alamat << "," << a.ttl << "," << a.email << "," << a.status << "," << endl;
+    file close ();
+    cout << "Daata anggota berhasil disimpan\n";
+} else {
+     cout << "Gagal membuka file\n" ;
+}
+
+
+
+
+
+    
