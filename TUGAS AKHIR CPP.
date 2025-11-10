@@ -20,7 +20,6 @@ void tambahpetugas(){
     cout<<"masukkan nama";
     cin.ignore();
     getline(cin,p.nama);
-}
 
 ofstream file("petugas.txt", ios::app);
 if (file.is_open()) {
@@ -29,6 +28,7 @@ if (file.is_open()) {
     cout << "Data anggota berhasil disimpan\n";
 } else {
      cout << "Gagal membuka file\n" ;
+}
 }
 bool loginpetugas(){
 string user, pass;
