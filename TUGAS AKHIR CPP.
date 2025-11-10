@@ -17,7 +17,9 @@ void tambahpetugas(){
     cin>>p.username;
     cout<<"masukkan password";
     cin>>p.password;
+    cout<<"masukkan nama";
     cin.ignore();
+    getline(cin,p.nama);
 }
 
 ofstream file("petugas.txt", ios::app);
