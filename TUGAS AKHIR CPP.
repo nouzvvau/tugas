@@ -17,6 +17,7 @@ void tambahpetugas(){
     cin>>p.username;
     cout<<"masukkan password";
     cin>>p.password;
+    cin.ignore();
 }
 
 ofstream file("petugas.txt", ios::app);
@@ -63,6 +64,8 @@ if (file.is_open()) {
 } else {
      cout << "Gagal membuka file\n" ;
 }
+
+
 
 
 
