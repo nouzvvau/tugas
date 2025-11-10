@@ -30,6 +30,15 @@ if (file.is_open()) {
 } else {
      cout << "Gagal membuka file\n" ;
 }
+bool loginpetugas(){
+string user, pass;
+cout<< "Masukkan username";
+cin>>user;
+cout<<"Masukkan password";
+cin>>pass;
+if (p.username == user && p.password == pass) {
+cout<<"Berhasil login";
+
 
 struct anggota {
     string idAnggota;
@@ -67,7 +76,17 @@ if (file.is_open()) {
      cout << "Gagal membuka file\n" ;
 }
 
-
+int main () {
+int pilihan
+do{
+cout<<"Login : ";
+switch (pilihan){
+case 1 : loginpetugas();
+}
+while (pilihan <1)
+}
+return 0;
+return }
 
 
 
