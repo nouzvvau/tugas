@@ -1,8 +1,46 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
+struct Anggota {
+    string kode;
+    string nama;
+    string alamat;
+    string ttl;
+    string email;
+    bool status;
+};
+
 void TambahBuku();
-void TambahAnggota();
+void TambahAnggota(){
+    Anggota u;
+
+    cout << "\nMasukkan nama lengkap: ";
+    getline(cin, u.nama);
+
+    cout << "\nMasukkan alamat (Kab, Kec, Ds): ";
+    getline(cin, u.alamat);
+    
+    cout << "\nMasukkan tempat tanggal lahir (Tempat, YYYY-MM-DD): ";
+    getline(cin, u.ttl);
+    int pos = u.ttl.find(" ");
+
+    cout << "\nMasukkan email: ";
+    getline(cin, u.email);
+
+    string inputStatus;
+    cout << "\nStatus (aktif/nonaktif): ";
+    getline(cin, inputStatus);
+    u.status = (inputStatus == "aktif");
+
+    cout << "\n=====DATA ANGGOTA=====\n"; //OUTPUT
+    cout << "KODE = " << endl;
+    cout << "Nama: " << u.nama;
+    cout << "\nAlamat: " << u.alamat;
+    cout << "\nTTL: " << u.ttl;
+    cout << "\nEmail: " << u.email;
+    cout << "\nStatus: " << (u.status ? "aktif" : "nonaktif") << endl;
+};
 void TambahPinjaman();
 void TampilData();
 void CariData();
@@ -25,7 +63,7 @@ int main()
         cout << "8.Update Stok Buku" << endl;
         cout << "9.Keluar" << endl;
         cout << "=====================================" << endl;
-        cout << "PIlih Menu (1-9) : " << endl;
+        cout << "Pilih Menu (1-9) : " << endl;
         cin >> pilihan;
 
         switch(pilihan) {
