@@ -49,7 +49,7 @@ int main() {
     while (lagi == 'y' || lagi == 'Y') {
             tambahAnggota();
 
-    cout << "Tambah anggota lagi? (ya/tidak): ";
+    cout << "Tambah anggota lagi? (y/n): ";
     cin >> lagi;
     cin.ignore();
     }
