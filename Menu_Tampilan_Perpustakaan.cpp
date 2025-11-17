@@ -2,15 +2,6 @@
 #include <string>
 using namespace std;
 
-struct Anggota {
-    string kode;
-    string nama;
-    string alamat;
-    string ttl;
-    string email;
-    bool status;
-};
-
 void TambahBuku();
 void TambahAnggota();
 void TampilAnggota();
