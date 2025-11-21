@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 
 struct Anggota {
@@ -10,8 +11,17 @@ struct Anggota {
     string email;
     bool status;
 };
+struct Buku{
+    string judul;
+    string penerbit;
+    string tahunterbit;
+    string pengarang;
+    string id;
+    string isbn;
+};
 
-void TambahBuku();
+void TambahBuku(){}
+
 void TambahAnggota(){
     Anggota u;
 
@@ -82,3 +92,4 @@ int main()
         } while (pilihan !=9);
 
              return 0;
+}
