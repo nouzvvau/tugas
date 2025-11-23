@@ -27,9 +27,11 @@ string generateID6() {
     return id;
 }
 
-//menambahkan anggota
+//MENAMBAHKAN ANGGOTA
 void TambahAnggota(){
     Anggota u;
+
+    cout << "===== MENAMBAHKAN ANGGOTA =====\n";
 
     u.id = generateID6();
 
@@ -39,7 +41,7 @@ void TambahAnggota(){
     cout << "Masukkan alamat: ";
     getline(cin, u.alamat);
     
-    cout << "Masukkan tempat tanggal lahir (Tempat, YYYY-MM-DD): ";
+    cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
     getline(cin, u.ttl); 
 
     cout << "Masukkan email: ";
@@ -52,37 +54,34 @@ void TambahAnggota(){
 
     //MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt
     //isine mek percobaan tok cah hehe
-    ofstream file("anggota.txt", ios::app);
+    ofstream file;
+    file.open("anggota.txt", ios::app);
     if(!file){
         cout << "File tidak bisa dibuka!" << endl;
     }
-
     file << u.id << " | ";
     file << u.nama << " | ";
     file << u.alamat << " | ";
     file << u.ttl << " | ";
     file << u.email << " | ";
-    file << (u.status ? "aktif" : "nonaktif");
+    file << u.status;
     file << endl;
     file.close();
 
-    //OUTPUT
-    cout << "\n=====DATA ANGGOTA=====\n";
-    cout << "Kode = " ;
-    cout << "\nNama: " << u.nama;
-    cout << "\nAlamat: " << u.alamat;
-    cout << "\nTTL: " << u.ttl;
-    cout << "\nEmail: " << u.email;
-    cout << "\nStatus: " << (u.status ? "aktif" : "nonaktif") << endl;
+    cout << "Anggota berhasil ditambahkan!" << endl;
 };
 
-
-//menampilkan semua anggota
+//MENAMPILKAN SEMUA ANGGOTA
 void tampilkanAnggota(){
-    cout << "\n === DAFTAR ANGGOTA ===" << endl;
-    for (auto a : daftarAnggota){
-        cout << "Nama: " << a.nama << " | ID: " << a.id << endl;
-        }
+    cout << "\n===== DAFTAR ANGGOTA =====\n";
+    ifstream file;
+    string data [6];
+
+    file.open("anggota.txt");
+
+    file >> data[6];
+
+    cout << data[0] << endl;
 }
 
 int main() {
