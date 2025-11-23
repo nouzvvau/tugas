@@ -20,35 +20,54 @@ vector<Anggota> daftarAnggota;
 
 //membuat id 6 digit otomatis
 string generateID6() {
-    string id = " ";
+    string id = "";
     for (int i = 0; i < 6; i++) {
         id += to_string(rand() % 10); // mengambil angka random 0-9, ubah jadi string lalu di gabung ke id
     }
     return id;
 }
 
-//tambah anggota
+//menambahkan anggota
 void TambahAnggota(){
     Anggota u;
 
-    cout << "\nMasukkan nama lengkap: ";
+    u.id = generateID6();
+
+    cout << "Masukkan nama lengkap: ";
     getline(cin, u.nama);
 
-    cout << "\nMasukkan alamat: ";
+    cout << "Masukkan alamat: ";
     getline(cin, u.alamat);
     
-    cout << "\nMasukkan tempat tanggal lahir (Tempat, YYYY-MM-DD): ";
+    cout << "Masukkan tempat tanggal lahir (Tempat, YYYY-MM-DD): ";
     getline(cin, u.ttl); 
 
-    cout << "\nMasukkan email: ";
+    cout << "Masukkan email: ";
     getline(cin, u.email);
 
     string inputStatus;
-    cout << "\nStatus (aktif/nonaktif): ";
+    cout << "Status (aktif/nonaktif): ";
     getline(cin, inputStatus);
     u.status = (inputStatus == "aktif");
 
-    cout << "\n=====DATA ANGGOTA=====\n"; //OUTPUT
+    //MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt
+    //isine mek percobaan tok cah hehe
+    ofstream file("anggota.txt", ios::app);
+    if(!file){
+        cout << "File tidak bisa dibuka!" << endl;
+    }
+
+    file << u.id << " | ";
+    file << u.nama << " | ";
+    file << u.alamat << " | ";
+    file << u.ttl << " | ";
+    file << u.email << " | ";
+    file << (u.status ? "aktif" : "nonaktif");
+    file << endl;
+    file.close();
+
+    //OUTPUT
+    cout << "\n=====DATA ANGGOTA=====\n";
     cout << "Kode = " ;
     cout << "\nNama: " << u.nama;
     cout << "\nAlamat: " << u.alamat;

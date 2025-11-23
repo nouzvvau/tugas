@@ -1,0 +1,4 @@
+436101 | nazwa | kauman | tulungagung, 1300999 | nzwffhnwr | aktif
+474671 | luffy | east blur | 13002244 | mugiwara@email.com | aktif
+071248 | naruto | konoha | 13000988 | uzumaki@gmail.com | aktif
+197967 | Uchiha Sasuke | konoha | konoha, 12000908 | akatsuki@email.com | nonaktif
