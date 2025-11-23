@@ -3,13 +3,17 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 struct Anggota
 {
     string id;
     string nama;
-
+    string alamat;
+    string ttl;
+    string email;
+    bool status;
 };
 
 vector<Anggota> daftarAnggota;
@@ -30,24 +34,23 @@ void TambahAnggota(){
     cout << "\nMasukkan nama lengkap: ";
     getline(cin, u.nama);
 
-    cout << "\nMasukkan alamat (Kab, Kec, Ds): ";
+    cout << "\nMasukkan alamat: ";
     getline(cin, u.alamat);
     
     cout << "\nMasukkan tempat tanggal lahir (Tempat, YYYY-MM-DD): ";
-    getline(cin, u.ttl);
-    int pos = u.ttl.find(" ");
+    getline(cin, u.ttl); 
 
     cout << "\nMasukkan email: ";
     getline(cin, u.email);
 
-string inputStatus;
+    string inputStatus;
     cout << "\nStatus (aktif/nonaktif): ";
     getline(cin, inputStatus);
     u.status = (inputStatus == "aktif");
 
     cout << "\n=====DATA ANGGOTA=====\n"; //OUTPUT
-    cout << "KODE = " << endl;
-    cout << "Nama: " << u.nama;
+    cout << "Kode = " ;
+    cout << "\nNama: " << u.nama;
     cout << "\nAlamat: " << u.alamat;
     cout << "\nTTL: " << u.ttl;
     cout << "\nEmail: " << u.email;
@@ -68,9 +71,9 @@ int main() {
 
     char lagi = 'y';
     while (lagi == 'y' || lagi == 'Y') {
-            tambahAnggota();
+            TambahAnggota();
 
-    cout << "Tambah anggota lagi? (y/n): ";
+    cout << "\nTambah anggota lagi? (y/n): ";
     cin >> lagi;
     cin.ignore();
     }
@@ -78,5 +81,3 @@ int main() {
 
     return 0;
 }
-
-
