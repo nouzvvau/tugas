@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 struct Anggota
@@ -54,16 +55,15 @@ void TambahAnggota(){
 
     //MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt
     //isine mek percobaan tok cah hehe
-    ofstream file;
-    file.open("anggota.txt", ios::app);
+    ofstream file("data/anggota.txt", ios::app);
     if(!file){
         cout << "File tidak bisa dibuka!" << endl;
     }
-    file << u.id << " | ";
-    file << u.nama << " | ";
-    file << u.alamat << " | ";
-    file << u.ttl << " | ";
-    file << u.email << " | ";
+    file << u.id << "|";
+    file << u.nama << "|";
+    file << u.alamat << "|";
+    file << u.ttl << "|";
+    file << u.email << "|";
     file << u.status;
     file << endl;
     file.close();
@@ -73,15 +73,34 @@ void TambahAnggota(){
 
 //MENAMPILKAN SEMUA ANGGOTA
 void tampilkanAnggota(){
-    cout << "\n===== DAFTAR ANGGOTA =====\n";
     ifstream file;
-    string data [6];
+    string baris;
 
-    file.open("anggota.txt");
+    file.open("data/anggota.txt");
+    if(!file){
+        cout << "File tidak bisa dibuka!" << endl;
+    }
 
-    file >> data[6];
+    cout << "\n===== DAFTAR ANGGOTA =====\n";
 
-    cout << data[0] << endl;
+    while (getline(file, baris))
+    {
+        //jika baris kosong maka lewati
+        if(baris.empty()){continue;}
+
+        stringstream ss(baris);
+        string id, nama, alamat, ttl, email;
+        bool status;
+
+        getline(ss, id, '|');
+        getline(ss, nama, '|');
+        getline(ss, alamat, '|');
+        getline(ss, ttl, '|');
+        getline(ss, email, '|');
+        //status e urung
+
+    };
+    
 }
 
 int main() {
@@ -91,9 +110,9 @@ int main() {
     while (lagi == 'y' || lagi == 'Y') {
             TambahAnggota();
 
-    cout << "\nTambah anggota lagi? (y/n): ";
-    cin >> lagi;
-    cin.ignore();
+        cout << "\nTambah anggota lagi? (y/n): ";
+        cin >> lagi;
+        cin.ignore();
     }
     tampilkanAnggota();
 
