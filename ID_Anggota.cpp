@@ -48,13 +48,10 @@ void TambahAnggota(){
     cout << "Masukkan email: ";
     getline(cin, u.email);
 
-    string inputStatus;
-    cout << "Status (aktif/nonaktif): ";
-    getline(cin, inputStatus);
-    u.status = (inputStatus == "aktif");
-
+    cout << "Status (1/0): "; //(1) jika aktif, (0) jika nonaktif
+    cin >> u.status;
+    
     //MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt
-    //isine mek percobaan tok cah hehe
     ofstream file("data/anggota.txt", ios::app);
     if(!file){
         cout << "File tidak bisa dibuka!" << endl;
@@ -64,8 +61,7 @@ void TambahAnggota(){
     file << u.alamat << "|";
     file << u.ttl << "|";
     file << u.email << "|";
-    file << u.status;
-    file << endl;
+    file << u.status << endl;
     file.close();
 
     cout << "Anggota berhasil ditambahkan!" << endl;
@@ -83,6 +79,9 @@ void tampilkanAnggota(){
 
     cout << "\n===== DAFTAR ANGGOTA =====\n";
 
+    string ttlSebelumnya = "";
+    int noUrut = 0;
+
     while (getline(file, baris))
     {
         //jika baris kosong maka lewati
@@ -97,10 +96,44 @@ void tampilkanAnggota(){
         getline(ss, alamat, '|');
         getline(ss, ttl, '|');
         getline(ss, email, '|');
-        //status e urung
+        string statusSTR;
+        getline(ss, statusSTR, '|');
+        status = (statusSTR == "1");
 
-    };
-    
+        //yyyymmdd
+        string tanggalAsli = ttl.substr(ttl.find(",")+2);
+        string tahun = tanggalAsli.substr(0, 4);
+        string bulan = tanggalAsli.substr(5, 2);
+        string tanggal = tanggalAsli.substr(8, 2);
+
+        string baseKode = tahun + bulan + tanggal;
+
+        //...nomor urut...
+        if (tanggalAsli == ttlSebelumnya) {noUrut++;}
+        else {
+            ttlSebelumnya = tanggalAsli;
+            noUrut = 1;
+        }
+
+        //...3 digit...
+        string urut;
+        if (noUrut < 10) urut = "00" + to_string(noUrut);
+        else if (noUrut < 100) urut = "0" + to_string(noUrut);
+        else urut = to_string(noUrut);
+
+        string kode = baseKode + urut;
+
+        //OUTPUT
+        cout << "ID       : " << id << endl;
+        cout << "Kode     : " << kode << endl;
+        cout << "Nama     : " << nama << endl;
+        cout << "Alamat   : " << alamat << endl;
+        cout << "TTL      : " << ttl << endl;
+        cout << "Email    : " << email << endl;
+        cout << "Status   : " << (status ? "aktif" : "nonaktif") << endl;
+        cout << "------------------------------------------------" << endl;    
+    }
+    file.close();
 }
 
 int main() {
@@ -115,6 +148,5 @@ int main() {
         cin.ignore();
     }
     tampilkanAnggota();
-
     return 0;
 }
