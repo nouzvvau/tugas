@@ -15,32 +15,32 @@ struct Buku{
 
 void TambahBuku()
 {
-Buku a;
-cout<<"Masukkan judul buku: ";
-getline(cin,a.judul);
-cout<<"Masukkan pengarang : ";
-getline(cin,a.pengarang);
-cout<<"Masukkan penerbit : ";
-getline(cin,a.penerbit);
-cout<<"Tahun terbit : ";
-getline(cin,a.tahunterbit);
-cout<<"Masukkan ISBN : ";
-cin>> a.isbn;
-//pengecekkan isbn harus 13 digit
+    Buku a;
+    cout<<"Masukkan judul buku: ";
+    getline(cin,a.judul);
+    cout<<"Masukkan pengarang : ";
+    getline(cin,a.pengarang);
+    cout<<"Masukkan penerbit : ";
+    getline(cin,a.penerbit);
+    cout<<"Tahun terbit : ";
+    getline(cin,a.tahunterbit);
+    cout<<"Masukkan ISBN : ";
+    cin>> a.isbn;
 
-while (a.isbn.length() != 13) {
-    cout << "ISBN harus tepat 13 digit, coba lagi: ";
-    cin >> a.isbn;
-}
+    //pengecekkan isbn harus 13 digit
+    while (a.isbn.length() != 13) {
+        cout << "ISBN harus tepat 13 digit, coba lagi: ";
+        cin >> a.isbn;
+    }
 
-cout<<"Masukan stok buku awal : ";
-cin>>a.stok;
+    cout<<"Masukan stok buku awal : ";
+    cin>>a.stok;
 
-//======================= ID BUKU ====================
+    //======================= ID BUKU ====================
 
-//ambil ID terakhir
+    //ambil ID terakhir
     string lastLine, baris;
-    ifstream baca("buku.txt");
+    ifstream baca("data/buku.txt");
     while (getline(baca, baris)) {
         lastLine = baris; // simpan baris terakhir
     }
@@ -53,26 +53,31 @@ cin>>a.stok;
         lastId = lastLine.substr(pos1 + 1, pos2 - pos1 - 1);//ambil id awal dan akhir
     }
 
-// naikkan ID
+    // naikkan ID
     int angka = stoi(lastId);
     angka++;
     string idBaru = to_string(angka);
     while (idBaru.length() < 6) idBaru = "0" + idBaru;
     a.id = idBaru;
 
-//simpan ke file
-ofstream file("buku.txt",ios :: app);
-if (file.is_open()){
-	//judul, id, isbn, pengarang, penerbit, tahun terbit, stok
-	file<<a.judul<<" | "<<a.id<<" | "<<a.isbn<<" | "<<a.pengarang<<" | "<<a.penerbit<<" | "<<a.tahunterbit<<" | "<<a.stok<<endl;
-    
+    //simpan ke file
+    ofstream file("data/buku.txt", ios :: app);
+    if (file.is_open()){
+        //judul, id, isbn, pengarang, penerbit, tahun terbit, stok
+        file << a.judul << "|";
+        file << a.id << "|";
+        file << a.isbn << "|";
+        file << a.pengarang << "|";
+        file << a.penerbit << "|";
+        file << a.tahunterbit << "|";
+        file << a.stok << endl;
+    } else {
+        cout<<"Gagal membuka file";
+    }
+}
 
-} else {
-	cout<<"Gagal membuka file";
-}
-}
 void TampilBuku() {
-    ifstream file("buku.txt");
+    ifstream file("data/buku.txt");
     string baris;
 
     while (getline(file, baris)) {
@@ -83,7 +88,6 @@ void TampilBuku() {
 }
 
 
-    
 int main (){
     TambahBuku();
     TampilBuku();
