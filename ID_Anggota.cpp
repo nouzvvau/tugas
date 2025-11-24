@@ -51,7 +51,7 @@ void TambahAnggota(){
     cout << "Status (1/0): "; //(1) jika aktif, (0) jika nonaktif
     cin >> u.status;
     
-    //MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt
+    //.....===== MENULIS DATA ANGGOTA KE DALAM FILE anggota.txt =====.....
     ofstream file("data/anggota.txt", ios::app);
     if(!file){
         cout << "File tidak bisa dibuka!" << endl;
@@ -67,7 +67,7 @@ void TambahAnggota(){
     cout << "Anggota berhasil ditambahkan!" << endl;
 };
 
-//MENAMPILKAN SEMUA ANGGOTA
+//.....===== MENAMPILKAN SEMUA ANGGOTA =====.....
 void tampilkanAnggota(){
     ifstream file;
     string baris;
