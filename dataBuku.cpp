@@ -35,24 +35,28 @@ void TambahBuku()
 
     cout<<"Masukan stok buku awal : ";
     cin>>a.stok;
+    cin.ignore();
 
     //======================= ID BUKU ====================
 
     //ambil ID terakhir
-    string lastLine, baris;
-    ifstream baca("data/buku.txt");
-    while (getline(baca, baris)) {
-        lastLine = baris; // simpan baris terakhir
-    }
-    baca.close();
+    string lastId = " "; // default
 
-    string lastId ; 
-    if (!lastLine.empty()) {
-        size_t pos1 = lastLine.find(" | ");//cari awal id
-        size_t pos2 = lastLine.find(" | ", pos1 + 1);//cari akhir id
-        lastId = lastLine.substr(pos1 + 1, pos2 - pos1 - 1);//ambil id awal dan akhir
-    }
+// baca baris terakhir
+string lastLine, baris;
+ifstream baca("buku.txt");
+while (getline(baca, baris)) {
+    lastLine = baris;
+}
+baca.close();
 
+// kalau file tidak kosong, ambil ID
+if (!lastLine.empty()) {
+    size_t p1 = lastLine.find('|');           // posisi pemisah pertama
+    size_t p2 = lastLine.find('|', p1 + 1);   // posisi pemisah kedua
+
+    lastId = lastLine.substr(p1 + 1, p2 - p1 - 1);
+}
     // naikkan ID
     int angka = stoi(lastId);
     angka++;
@@ -61,7 +65,7 @@ void TambahBuku()
     a.id = idBaru;
 
     //simpan ke file
-    ofstream file("data/buku.txt", ios :: app);
+    ofstream file("buku.txt", ios :: app);
     if (file.is_open()){
         //judul, id, isbn, pengarang, penerbit, tahun terbit, stok
         file << a.judul << "|";
@@ -77,7 +81,7 @@ void TambahBuku()
 }
 
 void TampilBuku() {
-    ifstream file("data/buku.txt");
+    ifstream file("buku.txt");
     string baris;
 
     while (getline(file, baris)) {
