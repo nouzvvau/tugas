@@ -80,16 +80,38 @@ if (!lastLine.empty()) {
     }
 }
 
-void TampilBuku() {
-    ifstream file("buku.txt");
-    string baris;
 
-    while (getline(file, baris)) {
-        cout << baris << endl;
+
+    void TampilBuku() {
+    ifstream file("buku.txt");
+
+    const int max = 500;
+    string data[max];
+    int n = 0;
+
+    // baca file
+    while (n < max && getline(file, data[n])) {
+        n++;
     }
 
     file.close();
-}
+
+  // bubble sort
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (data[j] > data[j + 1]) {
+                string temp = data[j];
+                data[j] = data[j + 1];
+                data[j + 1] = temp;
+            }
+        }
+    }
+
+    // tampilkan
+    for (int i = 0; i < n; i++) {
+        cout << data[i] << endl;
+    }
+    }
 
 
 int main (){
