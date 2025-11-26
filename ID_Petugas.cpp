@@ -1,64 +1,156 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
+#include <conio.h>
 using namespace std;
 
-//struktur petugas
-struct Petugas {
-    string id;
-    string nama;
-};
+// masking password 6 karakter
+string inputPassword() {
+    string pass = "";
+    char ch;
 
-vector <Petugas> daftarPetugas;
-
-//membuat ID 6 digit otomatis
-string generateID6() {
-    string id = "";
-    for (int i = 0; i < 6; i++) {
-        id += to_string(rand() % 10);
+    while (true) {
+        pass = "";
+        cout << "Masukkan Password (6 karakter): ";
+        while ((ch = _getch())) {
+            if (ch == 13) { // Enter
+                cout << endl;
+                break;
+            } else if (ch == 8) { // Backspace
+                if (!pass.empty()) {
+                    cout << "\b \b";
+                    pass.pop_back();
+                }
+            } else {
+                pass.push_back(ch);
+                cout << "*";
+            }
+        }
+        if (pass.length() != 6) {
+            cout << "Password harus 6 karakter! Coba lagi.\n";
+        } else {
+            break;
+        }
     }
-    return id;
+    return pass;
 }
-//tambah petugas
+
+// cek apakah username sudah ada
+bool usernameSudahAda(string userCari) {
+    ifstream file("petugas.txt");
+    string line, id, username;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        getline(ss, id, '|');
+        getline(ss, username, '|');
+        if (username == userCari)
+            return true;
+    }
+    return false;
+}
+
+// dapatkan ID terakhir dari file, jika kosong mulai dari 181924
+int getLastID() {
+    ifstream file("petugas.txt");
+    string line, id;
+    int lastID = 181924; // supaya yang pertama 181925
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        getline(ss, id, '|');
+        int numID = stoi(id);
+        if (numID > lastID) lastID = numID;
+    }
+    return lastID;
+}
+
+// tambah petugas
 void tambahPetugas() {
-    string nama;
-    cout << "Masukkan nama petugas: ";
+    string username, password, nama;
+
+    // ID otomatis urut
+    int idBaru = getLastID() + 1;
+    string idStr = to_string(idBaru);
+    cout << "\nID Petugas otomatis: " << idStr << endl;
+
+    // input Username
+    do {
+        cout << "Masukkan Username   : ";
+        cin >> username;
+        if (usernameSudahAda(username)) {
+            cout << "  Username sudah digunakan! Masukkan username lain.\n";
+        }
+    } while (usernameSudahAda(username));
+
+    // input Password
+    password = inputPassword();
+
+    // input Nama
+    cout << "Masukkan Nama       : ";
+    cin.ignore();
     getline(cin, nama);
 
-    string id = generateID6();
-    daftarPetugas.push_back({id, nama});
+    // smpan ke file
+    ofstream file("petugas.txt", ios::app);
+    file << idStr << "|" << username << "|" << password << "|" << nama << endl;
+    file.close();
 
-    cout << "Petugaas \"" << nama << "\" berhasil ditambahkan dan IDnya: " << id << endl;
-}
-//tampilkan semua petugas
-void tampilkanPetugas() {
-    cout << "\n === DAFTAR PETUGAS ===" << endl;
-    cout << "NO | Nama             | ID" << endl;
-    cout << "---------------------------" << endl;
-
-
-int n0 =1;
-for (auto p : daftarPetugas) {
-    cout << n0 << " | "
-         << p.nama << " | "
-         << p.id << endl;
-    n0++;
-   }
+    cout << "\nData petugas berhasil disimpan!" << endl;
 }
 
-int main()
-{
-    srand(time(0));
+//tampil semua petugas
+void tampilPetugas() {
+    ifstream file("petugas.txt");
+    string line;
 
-    char lagi = 'y';
-    while (lagi == 'y' || lagi == 'Y') {
-        tambahPetugas();
+    cout << "\n=== DAFTAR PETUGAS ===\n";
+    cout << "ID\tUsername\tPassword\tNama\n";
+    cout << "-------------------------------------------\n";
 
-        cout << "Tambah petugas lain? (y/n): ";
-        cin >> lagi;
-        cin.ignore();
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string id, username, password, nama;
+
+        getline(ss, id, '|');
+        getline(ss, username, '|');
+        getline(ss, password, '|');
+        getline(ss, nama, '|');
+
+        //masking password selalu 6 *
+        string passMasked(6, '*');
+
+        cout << id << "\t" << username << "\t\t" << passMasked << "\t\t" << nama << endl;
     }
-    tampilkanPetugas();
+
+    file.close();
+}
+
+int main() {
+    int pilihan;
+
+    do {
+        cout << "\n=== MENU PETUGAS ===\n";
+        cout << "1. Tambah Petugas\n";
+        cout << "2. Tampil Petugas\n";
+        cout << "0. Keluar\n";
+        cout << "Pilihan: ";
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case 1:
+                tambahPetugas();
+                break;
+            case 2:
+                tampilPetugas();
+                break;
+            case 0:
+                cout << "Keluar program...\n";
+                break;
+            default:
+                cout << "Pilihan salah!\n";
+        }
+    } while (pilihan != 0);
+
     return 0;
+}
