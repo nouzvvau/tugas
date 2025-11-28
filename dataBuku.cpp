@@ -113,6 +113,34 @@ if (!lastLine.empty()) {
     }
     }
 
+//=====Cari buku=====
+void CariBuku() {
+    string key;
+    cout << "Masukkan kata kunci: ";
+    getline(cin, key);
+
+    ifstream cari("buku.txt");
+    string baris;
+    bool ketemu = false;
+
+    if (!cari.is_open()) {
+        cout << "File tidak bisa dibuka.\n";
+        return;
+    }
+
+    while (getline(cari, baris)) {
+        if (baris.find(key) != string::npos) {
+            cout << baris << endl;
+            ketemu = true;
+        }
+    }
+
+    cari.close();
+
+    if (!ketemu) {
+        cout << "Kata kunci tidak ditemukan.\n";
+    }
+}
 
 int main (){
     TambahBuku();
