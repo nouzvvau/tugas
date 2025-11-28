@@ -397,7 +397,7 @@ cin >> ulang;
 void CariBuku() {
     string key;
     cout << "Masukkan kata kunci: ";
-    cin >> key; // ganti getline
+    cin >> key; 
 
     ifstream cari("buku.txt");
     string baris;
