@@ -1,5 +1,2 @@
-694581|helo|ok|ok|ok|0
-074153|Seren Khanzaa|bangoan|tulungagung, 20091028|seren@email.com|0
-786430|nazwa|kauman|tulungagung, 2009-09-13|nazwa@email.com|0
-464382|seren|bangoan|tulungagung, 2009-10-28|seren@email.com|0
-068213|zahwa|kalidawir|tulungagung, 2009-10-09|zahwa@email.com|1
+713792|20001223001|Uchiha Sasuke|Konoha|Konoha, 2000-12-23|sasukeganzz@email.com|1
+040320|20001223002|Senju Konohamaru|Konoha|Konoha, 2000-12-23|konohamaru@email.com|1

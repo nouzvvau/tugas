@@ -10,6 +10,7 @@ using namespace std;
 struct Anggota
 {
     string id;
+    string kode;
     string nama;
     string alamat;
     string ttl;
@@ -45,6 +46,35 @@ void TambahAnggota(){
     cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
     getline(cin, u.ttl); 
 
+    // ===== ... BUAT KODE 11 DIGIT ... =====
+    // Mengambil tanggal asli: "YYYY-MM-DD"
+    string tanggalAsli = u.ttl.substr(u.ttl.find(",") + 2);
+    string tahun = tanggalAsli.substr(0, 4);
+    string bulan = tanggalAsli.substr(5, 2);
+    string tanggal = tanggalAsli.substr(8, 2);
+
+    string baseKode = tahun + bulan + tanggal;
+
+    // Hitung nomor urut untuk hari yang sama
+    int noUrut = 1;
+    ifstream cek("data/anggota.txt");
+    string baris;
+    while (getline(cek, baris)) {
+        if (baris.find(baseKode) != string::npos) {
+            noUrut++;
+        }
+    }
+    cek.close();
+
+    // Format nomor urut 3 digit
+    string urut;
+    if (noUrut < 10) urut = "00" + to_string(noUrut);
+    else if (noUrut < 100) urut = "0" + to_string(noUrut);
+    else urut = to_string(noUrut);
+
+    u.kode = baseKode + urut;
+
+
     cout << "Masukkan email: ";
     getline(cin, u.email);
 
@@ -57,6 +87,7 @@ void TambahAnggota(){
         cout << "File tidak bisa dibuka!" << endl;
     }
     file << u.id << "|";
+    file << u.kode << "|";
     file << u.nama << "|";
     file << u.alamat << "|";
     file << u.ttl << "|";
@@ -79,19 +110,17 @@ void tampilkanAnggota(){
 
     cout << "\n===== DAFTAR ANGGOTA =====\n";
 
-    string ttlSebelumnya = "";
-    int noUrut = 0;
-
     while (getline(file, baris))
     {
         //jika baris kosong maka lewati
         if(baris.empty()){continue;}
 
         stringstream ss(baris);
-        string id, nama, alamat, ttl, email;
+        string id, kode, nama, alamat, ttl, email;
         bool status;
 
         getline(ss, id, '|');
+        getline(ss, kode, '|');
         getline(ss, nama, '|');
         getline(ss, alamat, '|');
         getline(ss, ttl, '|');
@@ -99,29 +128,6 @@ void tampilkanAnggota(){
         string statusSTR;
         getline(ss, statusSTR, '|');
         status = (statusSTR == "1");
-
-        //yyyymmdd
-        string tanggalAsli = ttl.substr(ttl.find(",")+2);
-        string tahun = tanggalAsli.substr(0, 4);
-        string bulan = tanggalAsli.substr(5, 2);
-        string tanggal = tanggalAsli.substr(8, 2);
-
-        string baseKode = tahun + bulan + tanggal;
-
-        //...nomor urut...
-        if (tanggalAsli == ttlSebelumnya) {noUrut++;}
-        else {
-            ttlSebelumnya = tanggalAsli;
-            noUrut = 1;
-        }
-
-        //...3 digit...
-        string urut;
-        if (noUrut < 10) urut = "00" + to_string(noUrut);
-        else if (noUrut < 100) urut = "0" + to_string(noUrut);
-        else urut = to_string(noUrut);
-
-        string kode = baseKode + urut;
 
         //OUTPUT
         cout << "ID       : " << id << endl;
