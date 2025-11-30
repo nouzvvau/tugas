@@ -5,6 +5,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 using namespace std;
 
 struct Anggota
@@ -17,8 +18,6 @@ struct Anggota
     string email;
     bool status;
 };
-
-vector<Anggota> daftarAnggota;
 
 //membuat id 6 digit otomatis
 string generateID6() {
@@ -98,19 +97,79 @@ void TambahAnggota(){
     cout << "Anggota berhasil ditambahkan!" << endl;
 };
 
-//.....===== MENAMPILKAN SEMUA ANGGOTA =====.....
+//.....===== MENAMPILKAN SEMUA ANGGOTA SECARA ASCENDING =====.....
 void tampilkanAnggota(){
     ifstream file;
     string baris;
+    string id, kode, nama, alamat, ttl, email;
+    bool status;
 
     file.open("data/anggota.txt");
     if(!file){
         cout << "File tidak bisa dibuka!" << endl;
     }
 
-    cout << "\n===== DAFTAR ANGGOTA =====\n";
+    vector<Anggota> list;
 
     while (getline(file, baris))
+    {
+        //jika baris kosong maka lewati
+        if(baris.empty()){continue;}
+
+        stringstream ss(baris);
+        Anggota u;
+
+        getline(ss, u.id, '|');
+        getline(ss, u.kode, '|');
+        getline(ss, u.nama, '|');
+        getline(ss, u.alamat, '|');
+        getline(ss, u.ttl, '|');
+        getline(ss, u.email, '|');
+        string statusSTR;
+        getline(ss, statusSTR, '|');
+        u.status = (statusSTR == "1");
+
+        list.push_back(u);
+    }
+    file.close();
+
+    // SORTING ASCENDING BERDASARKAN NAMA
+    sort(list.begin(), list.end(), [](const Anggota &a, const Anggota &b) {
+        return a.nama < b.nama;
+    });
+
+    //OUTPUT
+    cout << "\n===== DAFTAR ANGGOTA =====\n";
+    for (auto &u : list){
+        cout << "ID       : " << u.id << endl;
+        cout << "Kode     : " << u.kode << endl;
+        cout << "Nama     : " << u.nama << endl;
+        cout << "Alamat   : " << u.alamat << endl;
+        cout << "TTL      : " << u.ttl << endl;
+        cout << "Email    : " << u.email << endl;
+        cout << "Status   : " << (u.status ? "aktif" : "nonaktif") << endl;
+        cout << "------------------------------------------------" << endl << endl;
+    }  
+}
+
+//...=== CARI ANGGOTA === ...
+void CariAnggota(){
+    string cariKode;
+    cout << "\n=====PENCARIAN ANGGOTA=====\n";
+    cout << "\nMasukkan kode anggota : ";
+    cin >> cariKode;
+    cin.ignore();
+
+    ifstream cari;
+    string baris;
+    bool ketemu = false;
+
+    cari.open("data/anggota.txt");
+    if(!cari){
+        cout << "File tidak bisa dibuka!" << endl;
+    }
+
+    while (getline(cari, baris))
     {
         //jika baris kosong maka lewati
         if(baris.empty()){continue;}
@@ -129,18 +188,26 @@ void tampilkanAnggota(){
         getline(ss, statusSTR, '|');
         status = (statusSTR == "1");
 
-        //OUTPUT
-        cout << "ID       : " << id << endl;
-        cout << "Kode     : " << kode << endl;
-        cout << "Nama     : " << nama << endl;
-        cout << "Alamat   : " << alamat << endl;
-        cout << "TTL      : " << ttl << endl;
-        cout << "Email    : " << email << endl;
-        cout << "Status   : " << (status ? "aktif" : "nonaktif") << endl;
-        cout << "------------------------------------------------" << endl;    
+        if (kode == cariKode) {
+            ketemu = true;
+            cout << "\n===== DATA ANGGOTA DITEMUKAN =====\n";
+            cout << "ID       : " << id << endl;
+            cout << "Kode     : " << kode << endl;
+            cout << "Nama     : " << nama << endl;
+            cout << "Alamat   : " << alamat << endl;
+            cout << "TTL      : " << ttl << endl;
+            cout << "Email    : " << email << endl;
+            cout << "Status   : " << (status ? "aktif" : "nonaktif") << endl;
+            cout << "----------------------------------------------" << endl;
+            break;
+        }
     }
-    file.close();
-}
+
+    if (!ketemu) {
+        cout << "\nKode tidak ditemukan :(\n";
+    }
+    cari.close();
+};
 
 int main() {
     srand(time(0)); // agar id yang di berikan berbeda setiap di run
@@ -154,5 +221,6 @@ int main() {
         cin.ignore();
     }
     tampilkanAnggota();
+    CariAnggota();
     return 0;
 }

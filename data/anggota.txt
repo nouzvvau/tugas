@@ -1,2 +1,2 @@
-713792|20001223001|Uchiha Sasuke|Konoha|Konoha, 2000-12-23|sasukeganzz@email.com|1
-040320|20001223002|Senju Konohamaru|Konoha|Konoha, 2000-12-23|konohamaru@email.com|1
+718441|19901223001|Harry Potter|London|London, 1990-12-23|harrypo@email.com|1
+682428|20081010001|Naruto Uzumaki|Konoha|Konoha, 2008-10-10|narutohokage@email.com|1
