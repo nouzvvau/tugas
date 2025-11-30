@@ -256,7 +256,6 @@ void TampilAnggota() {
              << "\n----------------------------------------";
     }
 }
-*/
 struct Buku{
     string judul;
     string penerbit;
