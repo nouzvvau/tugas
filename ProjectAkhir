@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <conio.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -131,20 +132,129 @@ void tampilPetugas() {
     }
 }
 
+struct Anggota
+{
+    string id;
+    string kode;
+    string nama;
+    string alamat;
+    string ttl;
+    string email;
+    bool status;
+};
 
- /* int main() {
-    srand(time(0)); // agar id yang di berikan berbeda setiap di run
+vector<Anggota> daftarAnggota;
 
-    char lagi = 'y';
-    while (lagi == 'y' || lagi == 'Y') {
-            TambahAnggota();
+//membuat id 6 digit otomatis
+int getLastIDAnggota() {
+    ifstream file("anggota.txt");
+    string line, id;
+    int lastID = 262518;
 
-        cout << "\nTambah anggota lagi? (y/n): ";
-        cin >> lagi;
-        cin.ignore();
+    while (getline(file, line)) {
+        stringstream ss(line);
+        getline(ss, id, '|');
+
+        try {
+            int numID = stoi(id);
+            if (numID > lastID) lastID = numID;
+        } catch (...) {}
     }
-    tampilkanAnggota();
-    return 0;
+    return lastID + 1; // BUKAN memanggil dirinya sendiri
+}
+
+//MENAMBAHKAN ANGGOTA
+void TambahAnggota(){
+    Anggota u;
+    cin.ignore();
+
+    cout << "===== MENAMBAHKAN ANGGOTA =====\n";
+
+    u.id = to_string(getLastIDAnggota()); // FIX
+
+    cout << "Masukkan nama lengkap: ";
+    getline(cin, u.nama);
+
+    cout << "Masukkan alamat: ";
+    getline(cin, u.alamat);
+
+    cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
+    getline(cin, u.ttl);
+
+    cout << "Masukkan email: ";
+    getline(cin, u.email);
+
+    cout << "Status (1,0): ";
+    cin >> u.status;
+
+    // Generate kode anggota (YYYYMMDD + urut 3 digit)
+    string tanggalOnly = u.ttl.substr(u.ttl.find(",") + 2);
+    string baseKode = tanggalOnly.substr(0,4) + tanggalOnly.substr(5,2) + tanggalOnly.substr(8,2);
+
+    int nomor = rand() % 999 + 1;
+    string urut = (nomor < 10 ? "00" : nomor < 100 ? "0" : "") + to_string(nomor);
+    u.kode = baseKode + urut;
+
+    // SIMPAN KE FILE
+    ofstream file("anggota.txt", ios::app);
+    if(!file){
+        cout << "Gagal membuka file!\n"; return;
+    }
+
+    file << u.id << "|" << u.kode << "|" << u.nama << "|" << u.alamat << "|"
+         << u.ttl << "|" << u.email << "|" << u.status << endl;
+
+    file.close();
+
+    cout << "Anggota berhasil ditambahkan!\n";
+};
+
+void TampilAnggota() {
+    ifstream file("anggota.txt");
+    if (!file.is_open()) {
+        cout << "Tidak ada data anggota.\n";
+        return;
+    }
+
+    daftarAnggota.clear(); // pastikan kosong sebelum diisi
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        Anggota u;
+        string statusSTR;
+
+        getline(ss, u.id, '|');
+        getline(ss, u.kode, '|');
+        getline(ss, u.nama, '|');
+        getline(ss, u.alamat, '|');
+        getline(ss, u.ttl, '|');
+        getline(ss, u.email, '|');
+        getline(ss, statusSTR, '|');
+
+        u.status = (statusSTR == "1");
+        daftarAnggota.push_back(u); // simpan semua anggota
+    }
+    file.close();
+
+    // Sort setelah semua data masuk daftarAnggota
+    sort(daftarAnggota.begin(), daftarAnggota.end(), [](const Anggota &a, const Anggota &b) {
+        return a.nama < b.nama; // ascending
+    });
+
+    cout << "\n===== DATA ANGGOTA =====\n";
+    for (auto &u : daftarAnggota) {
+        cout << "\nID        : " << u.id
+             << "\nKode      : " << u.kode
+             << "\nNama      : " << u.nama
+             << "\nAlamat    : " << u.alamat
+             << "\nTTL       : " << u.ttl
+             << "\nEmail     : " << u.email
+             << "\nStatus    : " << (u.status ? "Aktif" : "Nonaktif")
+             << "\n----------------------------------------";
+    }
 }
 */
 struct Buku{
