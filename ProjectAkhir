@@ -343,45 +343,53 @@ cin >> ulang;
  }
 }
 
-    void TampilBuku() {
+void TampilBuku() {
     ifstream file("buku.txt");
+    string baris;
 
-    const int max = 500;
-    string data[max];
-    int n = 0;
+    if (!file) {
+        cout << "File tidak ditemukan!\n";
+        return;
+    }
 
-    // baca file
-    while (n < max && getline(file, data[n])) {
-        n++;
+    cout << "\n========== DAFTAR BUKU ==========\n\n";
+
+    while (getline(file, baris)) {
+        if (baris.empty()) continue;
+
+        stringstream ss(baris);
+        string judul, id, isbn, pengarang, penerbit, tahun, stok;
+
+        getline(ss, judul, '|');
+        getline(ss, id, '|');
+        getline(ss, isbn, '|');
+        getline(ss, pengarang, '|');
+        getline(ss, penerbit, '|');
+        getline(ss, tahun, '|');
+        getline(ss, stok, '|');
+
+        cout << "ID       : " << id << endl;
+        cout << "Judul    : " << judul << endl;
+        cout << "Pengarang: " << pengarang << endl;
+        cout << "Penerbit : " << penerbit << endl;
+        cout << "Tahun    : " << tahun << endl;
+        cout << "ISBN     : " << isbn << endl;
+        cout << "Stok     : " << stok << endl;
+        cout << "---------------------------------\n";
     }
 
     file.close();
-
-  // bubble sort
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - i - 1; j++) {
-            if (data[j] > data[j + 1]) {
-                string temp = data[j];
-                data[j] = data[j + 1];
-                data[j + 1] = temp;
-            }
-        }
-    }
-
-    // tampilkan
-    for (int i = 0; i < n; i++) {
-        cout << data[i] << endl;
-    }
-    }
+}
 
     //=====Cari buku=====
+
 void CariBuku() {
     string key;
     cout << "Masukkan kata kunci: ";
-    cin >> key; 
+    getline(cin, key);
 
     ifstream cari("buku.txt");
-    string baris;
+    string baris; //membaca baris
     bool ketemu = false;
 
     if (!cari.is_open()) {
@@ -391,7 +399,28 @@ void CariBuku() {
 
     while (getline(cari, baris)) {
         if (baris.find(key) != string::npos) {
-            cout << baris << endl;
+
+            // Baca detail dari baris
+            stringstream ss(baris);
+            string judul, id, isbn, pengarang, penerbit, tahun, stok;
+
+            getline(ss, judul, '|');
+            getline(ss, id, '|');
+            getline(ss, isbn, '|');
+            getline(ss, pengarang, '|');
+            getline(ss, penerbit, '|');
+            getline(ss, tahun, '|');
+            getline(ss, stok, '|');
+
+            cout << "\n=== Buku Ditemukan ===\n";
+            cout << "Judul     : " << judul << "\n";
+            cout << "ID        : " << id << "\n";
+            cout << "ISBN      : " << isbn << "\n";
+            cout << "Pengarang : " << pengarang << "\n";
+            cout << "Penerbit  : " << penerbit << "\n";
+            cout << "Tahun     : " << tahun << "\n";
+            cout << "Stok      : " << stok << "\n";
+
             ketemu = true;
         }
     }
