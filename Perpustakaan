@@ -1,0 +1,978 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <sstream>
+#include <conio.h>
+#include <algorithm>
+
+using namespace std;
+
+// fungsi
+void TambahPetugas();
+void TampilPetugas();
+void TambahAnggota();
+void TampilAnggota();
+void CariAnggota();
+void TambahBuku();
+void TampilBuku();
+void CariBuku();
+void TambahPinjaman();
+void PinjamBuku();
+void CariPinjaman();
+void PengembalianBuku();
+void BukuYangBelumKembali();
+void HapusBuku();
+void UpdateStok();
+
+
+// Manajemen petugas
+string inputPassword();
+bool usernameSudahAda(string userCari);
+int getLastID();
+
+// Password petugas
+string inputPassword() {
+    string pass = "";
+    char ch;
+
+    while (true) {
+        pass = "";
+        cout << "Masukkan Password (6 karakter): ";
+
+        while ((ch = _getch())) {
+            if (ch == 13) break;
+            else if (ch == 8) {
+                if (!pass.empty()) { cout << "\b \b"; pass.pop_back(); }
+            } else if (pass.length() < 6) {
+                pass.push_back(ch);
+                cout << "*";
+            }
+        }
+
+        cout << endl;
+        if (pass.length() == 6) break;
+        cout << "Password harus 6 karakter!\n";
+    }
+    return pass;
+}
+// Cek Username
+bool usernameSudahAda(string userCari) {
+    ifstream file("petugas.txt");
+    if (!file.is_open()) return false;
+    string line, id, username;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        getline(ss, id, '|');
+        getline(ss, username, '|');
+        if (username == userCari) return true;
+    }
+    return false;
+}
+
+// ID otomtis awalan 181925
+int getLastID() {
+    ifstream file("petugas.txt");
+    string line, id;
+    int lastID = 181924;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        if (!getline(ss, id, '|')) continue;
+        try {
+            int numID = stoi(id);
+            if (numID > lastID) lastID = numID;
+        } catch (...) {}
+    }
+    return lastID;
+}
+
+// Tambah petugas
+void TambahPetugas() {
+    string username, password, nama;
+    int idBaru = getLastID() + 1;
+
+    cout << "\nID Petugas otomatis: " << idBaru << endl;
+
+    do {
+        cout << "Masukkan Username   : ";
+        cin >> username;
+        if (usernameSudahAda(username)) cout << "  Username sudah digunakan!\n";
+    } while (usernameSudahAda(username));
+
+    password = inputPassword();
+
+    cout << "Masukkan Nama       : ";
+    cin.ignore();
+    getline(cin, nama);
+
+    ofstream file("petugas.txt", ios::app);
+    file << idBaru << "|" << username << "|" << password << "|" << nama << endl;
+    file.close();
+
+    cout << "\nData petugas berhasil disimpan!\n";
+}
+
+// Tampil petugas
+void TampilPetugas() {
+    ifstream file("petugas.txt");
+    if (!file.is_open()) {
+        cout << "Tidak ada data petugas.\n";
+        return;
+    }
+    string line;
+    cout << "\n=== DAFTAR PETUGAS ===\n";
+    cout << "ID\tUsername\tPassword\tNama\n";
+    cout << "-------------------------------------------\n";
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string id, username, password, nama;
+        getline(ss, id, '|');
+        getline(ss, username, '|');
+        getline(ss, password, '|');
+        getline(ss, nama, '|');
+        string mask(6, '*');
+        cout << id << "\t" << username << "\t\t" << mask << "\t\t" << nama << endl;
+    }
+}
+
+
+struct Anggota
+{
+    string id;
+    string kode;
+    string nama;
+    string alamat;
+    string ttl;
+    string email;
+    bool status;
+};
+
+vector<Anggota> daftarAnggota;
+
+//ID otomatis awalan 262519
+int getLastIDAnggota() {
+    ifstream file("anggota.txt");
+    string line, id;
+    int lastID = 262518;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        getline(ss, id, '|');
+
+        try {
+            int numID = stoi(id);
+            if (numID > lastID) lastID = numID;
+        } catch (...) {}
+    }
+    return lastID + 1; // BUKAN memanggil dirinya sendiri
+}
+
+//Manajemen Anggota
+void TambahAnggota(){
+    Anggota u;
+    cin.ignore();
+
+    cout << "===== MENAMBAHKAN ANGGOTA =====\n";
+
+    u.id = to_string(getLastIDAnggota()); // FIX
+
+    cout << "Masukkan nama lengkap: ";
+    getline(cin, u.nama);
+
+    cout << "Masukkan alamat: ";
+    getline(cin, u.alamat);
+
+    cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
+    getline(cin, u.ttl);
+
+    cout << "Masukkan email: ";
+    getline(cin, u.email);
+
+    cout << "Status (1,0): ";
+    cin >> u.status;
+
+    // Kode berdasarkan TTL + no urut berdasarkan nama
+string tanggal = u.ttl.substr(u.ttl.find(",") + 2);
+string baseKode = tanggal.substr(0,4) + tanggal.substr(5,2) + tanggal.substr(8,2);
+
+// Vector untuk menyimpan nama nama yang memiliki tanggal sama
+vector<string> namaSama;
+
+ifstream cek("anggota.txt");
+string line;
+
+while(getline(cek, line)){
+    size_t pos1 = line.find("|");
+    size_t pos2 = line.find("|", pos1 + 1);
+    size_t pos3 = line.find("|", pos2 + 1);
+
+    if(pos1 != string::npos && pos2 != string::npos && pos3 != string::npos){
+        string kodeFile = line.substr(pos1 + 1, pos2 - pos1 - 1);
+        string namaFile = line.substr(pos2 + 1, pos3 - pos2 - 1);
+
+        // Ambil hanya yang tanggal lahir sama
+        if(kodeFile.substr(0, 8) == baseKode){
+            namaSama.push_back(namaFile);
+        }
+    }
+}
+cek.close();
+
+// Masukkan nama anggota baru
+namaSama.push_back(u.nama);
+
+// Sort supaya urutan berdasarkan abjad
+sort(namaSama.begin(), namaSama.end());
+
+// Cari posisi anggota baru di vector sorted
+int posisi = 1;
+for(int i = 0; i < namaSama.size(); i++){
+    if(namaSama[i] == u.nama){
+        posisi = i + 1;
+        break;
+    }
+}
+
+// Format nomor urut (001, 002, ...)
+string nomor = (posisi < 10 ? "00" : posisi < 100 ? "0" : "") + to_string(posisi);
+
+u.kode = baseKode + nomor;
+
+// Simpan ke file
+ofstream file("anggota.txt", ios::app);
+if(!file){
+    cout << "Gagal membuka file!\n";
+    return;
+}
+
+file << u.id << "|" << u.kode << "|" << u.nama << "|" << u.alamat << "|"
+     << u.ttl << "|" << u.email << "|" << u.status << endl;
+
+file.close();
+
+cout << "\nAnggota berhasil ditambahkan!\n";
+
+}
+
+// Tampil anggota
+void TampilAnggota() {
+    ifstream file("anggota.txt");
+    if (!file.is_open()) {
+        cout << "Tidak ada data anggota.\n";
+        return;
+    }
+
+    daftarAnggota.clear(); // pastikan kosong sebelum diisi
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        Anggota u;
+        string statusSTR;
+
+        getline(ss, u.id, '|');
+        getline(ss, u.kode, '|');
+        getline(ss, u.nama, '|');
+        getline(ss, u.alamat, '|');
+        getline(ss, u.ttl, '|');
+        getline(ss, u.email, '|');
+        getline(ss, statusSTR, '|');
+
+        u.status = (statusSTR == "1");
+        daftarAnggota.push_back(u); // simpan semua anggota
+    }
+    file.close();
+
+    // Sort setelah semua data masuk daftarAnggota
+    sort(daftarAnggota.begin(), daftarAnggota.end(), [](const Anggota &a, const Anggota &b) {
+        return a.nama < b.nama; // ascending
+    });
+
+    cout << "\n===== DATA ANGGOTA =====\n";
+    for (auto &u : daftarAnggota) {
+        cout << "\nID        : " << u.id
+             << "\nKode      : " << u.kode
+             << "\nNama      : " << u.nama
+             << "\nAlamat    : " << u.alamat
+             << "\nTTL       : " << u.ttl
+             << "\nEmail     : " << u.email
+             << "\nStatus    : " << (u.status ? "Aktif" : "Nonaktif")
+             << "\n----------------------------------------";
+    }
+}
+
+//Cari anggota
+void CariAnggota() {
+    ifstream file("anggota.txt");
+    if (!file.is_open()) {
+        cout << "Tidak ada data anggota.\n";
+        return;
+    }
+
+    string kodeCari;
+    cout << "Masukkan kode anggota yang dicari: ";
+    cin >> kodeCari;
+
+    bool ditemukan = false;
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        Anggota u;
+        string statusSTR;
+
+        getline(ss, u.id, '|');
+        getline(ss, u.kode, '|');
+        getline(ss, u.nama, '|');
+        getline(ss, u.alamat, '|');
+        getline(ss, u.ttl, '|');
+        getline(ss, u.email, '|');
+        getline(ss, statusSTR, '|');
+
+        u.status = (statusSTR == "1");
+
+        if (u.kode == kodeCari) {
+            ditemukan = true;
+            cout << "\n===== DATA ANGGOTA =====\n";
+            cout << "\nID        : " << u.id
+                 << "\nKode      : " << u.kode
+                 << "\nNama      : " << u.nama
+                 << "\nAlamat    : " << u.alamat
+                 << "\nTTL       : " << u.ttl
+                 << "\nEmail     : " << u.email
+                 << "\nStatus    : " << (u.status ? "Aktif" : "Nonaktif")
+                 << "\n----------------------------------------\n";
+            break;
+        }
+    }
+
+    if (!ditemukan) {
+        cout << "Anggota dengan kode " << kodeCari << " tidak ditemukan.\n";
+    }
+
+    file.close();
+}
+
+
+// Buku
+struct Buku{
+    string judul;
+    string penerbit;
+    string tahunterbit;
+    string pengarang;
+    string id;
+    string isbn;
+    int stok;
+};
+
+// Tambah buku
+void TambahBuku()
+{
+    while(true) {
+    Buku a;
+    cin.ignore();
+    cout<<"Masukkan judul buku: ";
+    getline(cin,a. judul);
+    cout<<"Masukkan pengarang : ";
+    getline(cin,a.pengarang);
+    cout<<"Masukkan penerbit : ";
+    getline(cin,a.penerbit);
+    cout<<"Tahun terbit : ";
+    getline(cin,a.tahunterbit);
+    cout<<"Masukkan ISBN : ";
+    cin>> a.isbn;
+
+    //pengecekkan isbn harus 13 digit
+    while (a.isbn.length() != 13) {
+        cout << "ISBN harus tepat 13 digit, coba lagi: ";
+        cin >> a.isbn;
+    }
+
+    cout<<"Masukan stok buku awal : ";
+    cin>>a.stok;
+    cin.ignore();
+
+    //ID Buku
+
+    //ambil ID terakhir
+    string lastId = "000000 "; // default
+
+// baca baris terakhir
+string lastLine, baris;
+ifstream baca("buku.txt");
+while (getline(baca, baris)) {
+    lastLine = baris;
+}
+baca.close();
+
+// kalau file tidak kosong, ambil ID
+if (!lastLine.empty()) {
+    size_t p1 = lastLine.find('|');           // posisi pemisah pertama
+    size_t p2 = lastLine.find('|', p1 + 1);   // posisi pemisah kedua
+
+    lastId = lastLine.substr(p1 + 1, p2 - p1 - 1);
+}
+    // naikkan ID
+    int angka = stoi(lastId);
+    angka++;
+    string idBaru = to_string(angka);
+    while (idBaru.length() < 6) idBaru = "0" + idBaru;
+    a.id = idBaru;
+
+    //simpan ke file
+    ofstream file("buku.txt", ios :: app);
+    if (file.is_open()){
+        //judul, id, isbn, pengarang, penerbit, tahun terbit, stok
+        file << a.judul << "|";
+        file << a.id << "|";
+        file << a.isbn << "|";
+        file << a.pengarang << "|";
+        file << a.penerbit << "|";
+        file << a.tahunterbit << "|";
+        file << a.stok << endl;
+    } else {
+        cout<<"Gagal membuka file";
+    }
+
+char ulang;
+cout << "Tambah buku lagi??(y/n)";
+cin >> ulang;
+ if (ulang != 'y' || ulang != 'Y'){
+    break;
+ }
+ }
+}
+
+// Tampil buku
+void TampilBuku() {
+    ifstream file("buku.txt");
+    string baris;
+
+    if (!file) {
+        cout << "File tidak ditemukan!\n";
+        return;
+    }
+
+    cout << "\n========== DAFTAR BUKU ==========\n\n";
+
+    while (getline(file, baris)) {
+        if (baris.empty()) continue;
+
+        stringstream ss(baris);
+        string judul, id, isbn, pengarang, penerbit, tahun, stok;
+
+        getline(ss, judul, '|');
+        getline(ss, id, '|');
+        getline(ss, isbn, '|');
+        getline(ss, pengarang, '|');
+        getline(ss, penerbit, '|');
+        getline(ss, tahun, '|');
+        getline(ss, stok, '|');
+
+        cout << "ID       : " << id << endl;
+        cout << "Judul    : " << judul << endl;
+        cout << "Pengarang: " << pengarang << endl;
+        cout << "Penerbit : " << penerbit << endl;
+        cout << "Tahun    : " << tahun << endl;
+        cout << "ISBN     : " << isbn << endl;
+        cout << "Stok     : " << stok << endl;
+        cout << "---------------------------------\n";
+    }
+
+    file.close();
+}
+    // Cari buku
+void CariBuku() {
+    string key;
+    cout << "Masukkan kata kunci: ";
+    cin.ignore();
+    getline(cin, key);
+
+    ifstream cari("buku.txt");
+    string baris; //membaca baris
+    bool ketemu = false;
+
+    if (!cari.is_open()) {
+        cout << "File tidak bisa dibuka.\n";
+        return;
+    }
+
+    while (getline(cari, baris)) {
+        if (baris.find(key) != string::npos) {
+
+            // Baca detail dari baris
+            stringstream ss(baris);
+            string judul, id, isbn, pengarang, penerbit, tahun, stok;
+
+            getline(ss, judul, '|');
+            getline(ss, id, '|');
+            getline(ss, isbn, '|');
+            getline(ss, pengarang, '|');
+            getline(ss, penerbit, '|');
+            getline(ss, tahun, '|');
+            getline(ss, stok, '|');
+
+            cout << "\n=== Buku Ditemukan ===\n";
+            cout << "Judul     : " << judul << "\n";
+            cout << "ID        : " << id << "\n";
+            cout << "ISBN      : " << isbn << "\n";
+            cout << "Pengarang : " << pengarang << "\n";
+            cout << "Penerbit  : " << penerbit << "\n";
+            cout << "Tahun     : " << tahun << "\n";
+            cout << "Stok      : " << stok << "\n";
+
+            ketemu = true;
+        }
+    }
+
+    cari.close();
+
+    if (!ketemu) {
+    cout << "Kata kunci kosong, pencarian dibatalkan!\n";
+    return;
+}
+
+
+    }
+
+    //===============================================================================PEMINJAMAN==================================================
+
+    //Stok buku
+    void kurangiStok(string idBuku) {
+    ifstream file("buku.txt");
+    string line, hasil = "";
+
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string judul, id, isbn, peng, penerbit, tahun, stokStr;
+        getline(ss, judul, '|');
+        getline(ss, id, '|');
+        getline(ss, isbn, '|');
+        getline(ss, peng, '|');
+        getline(ss, penerbit, '|');
+        getline(ss, tahun, '|');
+        getline(ss, stokStr, '|');
+
+        int stok = stoi(stokStr);
+        if (id == idBuku) stok--;
+
+        hasil += judul + "|" + id + "|" + isbn + "|" + peng + "|" + penerbit + "|" + tahun + "|" + to_string(stok) + "\n";
+    }
+    file.close();
+
+    ofstream out("buku.txt");
+    out << hasil;
+}
+
+//Cari anggota
+bool cariAnggota(string id) {
+    ifstream file("anggota.txt");
+    string line;
+
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string idFile, kode, nama, alamat, ttl, email, statusSTR;
+        getline(ss, idFile, '|');
+        getline(ss, kode, '|'); // skip kode
+        getline(ss, nama, '|'); // skip nama
+        getline(ss, alamat, '|');
+        getline(ss, ttl, '|');
+        getline(ss, email, '|');
+        getline(ss, statusSTR, '|');
+
+        if (idFile == id) return true;
+    }
+    return false;
+}
+
+//Cari buku peminjaman
+bool cariBuku(string idBuku, string &judul, int &stok) {
+    ifstream file("buku.txt");
+    string line;
+
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string j, id, isbn, peng, penerbit, tahun, stokStr;
+        getline(ss, j, '|');
+        getline(ss, id, '|');
+        getline(ss, isbn, '|');
+        getline(ss, peng, '|');
+        getline(ss, penerbit, '|');
+        getline(ss, tahun, '|');
+        getline(ss, stokStr, '|');
+
+        if (id == idBuku) {
+            judul = j;
+            stok = stoi(stokStr);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+// HITUNG DENDA (TELAT)
+// telat > 7 hari = (telat - 7) * 1000
+int hitungDenda(int hariPinjam) {
+    if (hariPinjam > 7) {
+        return (hariPinjam - 7) * 1000;
+    }
+    return 0;
+}
+
+// ID otomatis peminjaman di mulai 182619
+int getLastIDPinjaman() {
+    ifstream file("peminjaman.txt");
+    string line, id;
+    int lastID = 182618; // sebelum ID pertama
+
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        getline(ss, id, '|'); // asumsikan ID peminjaman ada di kolom pertama
+
+        try {
+            int numID = stoi(id);
+            if (numID > lastID) lastID = numID;
+        } catch (...) {}
+    }
+
+    file.close();
+    return lastID;
+}
+
+string generateIDPinjaman() {
+    int nextID = getLastIDPinjaman() + 1;
+    string id = to_string(nextID);
+
+    // pastikan 6 digit
+    while (id.length() < 6) id = "0" + id;
+
+    return id;
+    cout<<id;
+}
+
+// FUNGSI PINJAM BUKU (UTAMA)
+void pinjamBuku() {
+    string idAnggota, idBuku, judul;
+    int stok;
+
+    cout << "\n=== MENU PINJAM BUKU ===\n";
+
+    // ID peminjaman
+    string idPinjam = generateIDPinjaman();
+    cout << "ID Peminjaman: " << idPinjam << endl;
+
+    // Cari anggota
+    while (true) {
+        cout << "Masukkan ID Anggota: ";
+        cin >> idAnggota;
+
+        if (cariAnggota(idAnggota)) {
+            cout << "Anggota ditemukan!\n";
+            break;
+        } else {
+            cout << "Anggota TIDAK ADA, ulangi!\n";
+        }
+    }
+
+    // Cari buku
+    while (true) {
+        cout << "Masukkan ID Buku: ";
+        cin >> idBuku;
+
+        if (!cariBuku(idBuku, judul, stok)) {
+            cout << "Buku tidak ditemukan!\n";
+        }
+        else if (stok == 0) {
+            cout << "STOK HABIS ! Cari buku lain!\n";
+        }
+        else {
+            cout << "Buku ditemukan: " << judul << " (stok: " << stok << ")\n";
+            break;
+        }
+    }
+
+    // Kurangi stok
+    kurangiStok(idBuku);
+
+    //Input durasi jam
+    string tanggalpnjam;
+    cin.ignore();
+     cout << " Masukkan tanggal pinjam : ";
+     getline(cin,tanggalpnjam);
+    int lama;
+    cout << "Berapa hari dipinjam: ";
+    cin >> lama;
+
+    // Simpan data peminjaman
+    ofstream out("peminjaman.txt", ios::app);
+    out<< idPinjam << "|" << idAnggota << "|" << idBuku << "|" << judul<< "|" << tanggalpnjam << "|" <<  "0" << "|" << lama << " hari " << "|" << "Belum dikembalikan\n"; // denda nanti dihitung saat pengembalian
+    out.close();
+
+    cout << "\n=== PEMINJAMAN BERHASIL ===\n";
+    cout << "ID Peminjaman: " << idPinjam << endl;
+    cout << "Anggota       : " << idAnggota << endl;
+    cout << "Buku          : " << judul << endl;
+    cout << "Durasi        : " << lama << " hari\n";
+    cout << "Tanggal Pinjam: " << tanggalpnjam<< endl;
+
+}
+
+// Pengembalian buku
+
+void PengembalianBuku() {
+    string idPinjam;
+    cout << "Masukkan ID Peminjaman: ";
+    cin >> idPinjam;
+
+    ifstream in("peminjaman.txt");
+    if (!in.is_open()) {
+        cout << "File peminjaman tidak ditemukan!\n";
+        return;
+    }
+
+    string line, semuaData = "";
+    bool ketemu = false;
+
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string curID, idAnggota, idBuku, judul, lamaStr, dendaStr, status, tglKembali;
+        getline(ss, curID, '|');
+        getline(ss, idAnggota, '|');
+        getline(ss, idBuku, '|');
+        getline(ss, judul, '|');
+        getline(ss, lamaStr, '|');
+        getline(ss, dendaStr, '|');
+        getline(ss, status, '|');
+        getline(ss, tglKembali, '|');
+
+        if (curID == idPinjam) {
+            ketemu = true;
+
+            if (status == "Sudah Dikembalikan") {
+                cout << "Buku ini sudah dikembalikan sebelumnya!\n";
+                semuaData += line + "\n";
+                continue;
+            }
+
+            cout << "\n=== Data Peminjaman ===\n";
+            cout << "ID Peminjaman  : " << curID << "\n";
+            cout << "ID Anggota     : " << idAnggota << "\n";
+            cout << "ID Buku        : " << idBuku << "\n";
+            cout << "Judul Buku     : " << judul << "\n";
+            cout << "Lama Pinjam    : " << lamaStr << "\n";
+
+            string tglPengembalian;
+            cout << "Masukkan tanggal pengembalian (YYYY-MM-DD): ";
+            cin >> tglPengembalian;
+
+            int lamaPinjam = stoi(lamaStr);//angka
+            int denda = hitungDenda(lamaPinjam);
+
+            // Update line: tambahkan tanggal pengembalian, denda, status
+            stringstream updated;
+            updated << curID << "|" << idAnggota << "|" << idBuku << "|" << judul
+                    << "|" << lamaPinjam << "|" << denda << "|Sudah Dikembalikan|" << tglPengembalian;
+
+            semuaData += updated.str() + "\n";
+
+            cout << "\nBuku berhasil dikembalikan!\n";
+            cout << "Denda: Rp " << denda << "\n";
+        } else {
+            semuaData += line + "\n";
+        }
+    }
+    in.close();
+
+    if (!ketemu) {
+        cout << "ID Peminjaman tidak ditemukan!\n";
+        return;
+    }
+
+    ofstream out("peminjaman.txt");
+    out << semuaData;
+    out.close();
+}
+
+
+    //BELOM DI KERJAIN //
+void TambahPinjaman(){ cout<<"[ belum dibuat]\n"; }
+void CariPinjaman(){ cout<<"[belum dibuat]\n"; }
+void HapusBuku(){ cout<<"[ belum dibuat]\n"; }
+void UpdateStok(){ cout<<"[ belum dibuat]\n"; }
+void BukuYangBelumKembali(){ cout<<"[ belum dibuat]\n"; }
+
+
+int main() {
+    int pilihan1, pilihan, pilihan2;
+
+    cout << "===== MENU LOGIN =====\n";
+    cout << "1. PETUGAS\n";
+    cout << "2. ANGGOTA\n";
+    cout << "Masukkan pilihan: ";
+    cin >> pilihan1;
+
+    if (pilihan1 == 1) {
+        do {
+            cout << "\n===== MENU PERPUSTAKAAN =====\n";
+            cout << "1. Manajemen Petugas\n";
+            cout << "2. Manajemen Anggota\n";
+            cout << "3. Manajemen Buku\n";
+            cout << "4. Manajemen Peminjaman Dan Pengembalian\n";
+            cout << "5. Keluar\n";
+            cout << "=====================================\n";
+            cout << "Pilih Menu (1-5): ";
+            cin >> pilihan;
+
+            switch(pilihan) {
+
+                //================ MENUPETUGAS ================
+                case 1: {
+                    int p2;
+                    do {
+                        cout << "\n=== Manajemen Petugas ===\n";
+                        cout << "1. Tambah Petugas\n";
+                        cout << "2. Tampil Petugas\n";
+                        cout << "0. Kembali\n";
+                        cout << "Pilihan: ";
+                        cin >> p2;
+
+                        switch(p2) {
+                            case 1: TambahPetugas(); break;
+                            case 2: TampilPetugas(); break;
+                            case 0: cout << "Kembali ke menu utama...\n"; break;
+                            default: cout << "Pilihan tidak valid!\n";
+                        }
+                    } while(p2 != 0);
+                    break;
+                }
+
+                //================ MENU ANGGOTA ================
+                case 2: {
+                    int p2;
+                    do {
+                        cout << "\n=== Manajemen Anggota ===\n";
+                        cout << "1. Tambah Anggota\n";
+                        cout << "2. Tampil Anggota\n";
+                        cout << "3. Cari Anggota\n";
+                        cout << "0. Kembali\n";
+                        cout << "Pilihan: ";
+                        cin >> p2;
+
+                        switch(p2) {
+                            case 1: TambahAnggota(); break;
+                            case 2: TampilAnggota(); break;
+                            case 3: CariAnggota(); break;
+                            case 0: cout << "Kembali ke menu utama...\n"; break;
+                            default: cout << "Pilihan tidak valid!\n";
+                        }
+                    } while(p2 != 0);
+                    break;
+                }
+
+                //================ MENU BUKU ================
+                case 3: {
+                    int p2;
+                    do {
+                        cout << "\n=== Manajemen Buku ===\n";
+                        cout << "1. Tambah Buku\n";
+                        cout << "2. Tampil Buku\n";
+                        cout << "3. Cari Buku\n";
+                        cout << "4. Hapus Buku\n";
+                        cout << "5. Update Stok\n";
+                        cout << "0. Kembali\n";
+                        cout << "Pilihan: ";
+                        cin >> p2;
+
+                        switch(p2) {
+                            case 1: TambahBuku(); break;
+                            case 2: TampilBuku(); break;
+                            case 3: CariBuku(); break;
+                            case 4: HapusBuku(); break;
+                            case 5: UpdateStok(); break;
+                            case 0: cout << "Kembali ke menu utama...\n"; break;
+                            default: cout << "Pilihan tidak valid!\n";
+                        }
+                    } while(p2 != 0);
+                    break;
+                }
+
+                //================ MENU PINJAM ================
+                case 4: {
+                    int p2;
+                    do {
+                        cout << "\n=== Manajemen Peminjaman Dan Pengembalian ===\n";
+                        cout << "1. Tambah Pinjaman\n";
+                        cout << "2. Cari Pinjaman\n";
+                        cout << "3. Pengembalian Buku\n";
+                        cout << "4. Tampil Buku Yang Belum Dikembalikan\n";
+                        cout << "0. Kembali\n";
+                        cout << "Pilihan: ";
+                        cin >> p2;
+
+                        switch(p2) {
+                            case 1: pinjamBuku(); break;
+                            case 2: CariPinjaman(); break;
+                            case 3: PengembalianBuku(); break;
+                            case 4: BukuYangBelumKembali(); break;
+                            case 0: cout << "Kembali ke menu utama...\n"; break;
+                            default: cout << "Pilihan tidak valid!\n";
+                        }
+                    } while(p2 != 0);
+                    break;
+                }
+
+                case 5:
+                    cout << "Keluar dari menu Petugas...\n";
+                    break;
+
+                default:
+                    cout << "Pilihan tidak valid!\n";
+            }
+
+        } while(pilihan != 5);
+    }
+
+    //================ MENU ANGGOTA ====================
+    else if (pilihan1 == 2) {
+        do {
+            cout << "\n===== MENU ANGGOTA =====\n";
+            cout << "1. Cari Buku\n";
+            cout << "2. Tampil Buku\n";
+            cout << "3. Keluar\n";
+            cout << "Masukkan pilihan: ";
+            cin >> pilihan2;
+
+            switch(pilihan2) {
+                case 1: CariBuku(); break;
+                case 2: TampilBuku(); break;
+                case 3: cout << "Keluar dari menu Anggota...\n"; break;
+                default: cout << "Pilihan tidak valid!\n";
+            }
+
+        } while(pilihan2 != 3);
+    }
+
+    else {
+        cout << "Pilihan login tidak valid!\n";
+    }
+
+    return 0;
+}
