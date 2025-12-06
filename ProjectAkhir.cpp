@@ -487,7 +487,145 @@ void CariAnggota(){
     }
     cari.close();
 };
-void TambahPinjaman(){ cout<<"[ belum dibuat]\n"; }
+
+void TambahPinjaman(){ 
+    string ID_anggota;
+    cout << "=== TAMBAHKAN PINJAMAN! ===\n";
+    cout << "Masukkan ID anggota: ";
+    cin >> ID_anggota;
+
+    //=== CEK ID ANGGOTA DAN STATUS ===
+    ifstream file("data/anggota.txt");
+    if(!file.is_open()){
+        cout << "\nFILE TIDAK BISA DIBUKA!\n";
+        return;
+    }
+    
+    string baris;
+    bool aktif = false;
+
+    while(getline(file, baris)){
+        if(baris.empty()) continue;
+
+        stringstream ss (baris);
+        vector<string> kolom;
+        string isi;
+
+        // pisahkan
+        while(getline(ss, isi, '|')){
+            kolom.push_back(isi);
+        }
+
+        if(kolom.size() < 7) continue;
+
+        string ID = kolom[0];
+        string status = kolom[6];
+
+        if(ID == ID_anggota) {
+            if(status == "1") {
+                cout << "Anggota valid dan aktif!\n";
+                aktif = true; //simpan status
+                break;
+            } else {
+                cout << "Anggota nonaktif!\n";
+                return;
+            }
+        }
+    }
+    file.close();
+
+    //=== cek apakah ketemu ===
+    if(!aktif){
+        cout << "ID anggota tidak ditemukan!\n";
+        return;
+    }
+
+    // ===== PEMINJAMAN BUKU =====
+    string ID_buku;
+    cout << "\nMasukkan ID buku yang ingin dipinjam: \n";
+    cin >> ID_buku;
+    //  buke file buku.txt
+    ifstream buku("data/buku.txt");
+    if(!buku.is_open()){
+        cout << "file tidak ditemukan!\n";
+        return;
+    }
+    bool temukanbuku = false;
+    int stok = 0;
+    string line;
+
+    //  simpan semua buku untuk ditulis ulang
+    vector<string> semuaBaris;
+    int barisTarget = -1;   //baris buku yang ingin diedit
+    int noBaris = 0;    //penghitung baris saat loop
+
+    while(getline(buku, line)) {
+        semuaBaris.push_back(line);
+    
+        if(line.empty()) {
+            noBaris++;
+            continue;
+        }
+
+        stringstream ss(line);
+        vector<string> kolom;
+        string isi;
+
+        while(getline(ss, isi, '|')){
+            kolom.push_back(isi);
+        }
+
+        if(kolom.size() < 7){
+            noBaris++;
+            continue;
+        }
+
+        string ID = kolom[1]; //kolom 1 = ID buku
+        if(ID == ID_buku){
+            temukanbuku = true;
+            stok = stoi(kolom[6]); //kolom 6 = stok
+            barisTarget = noBaris; //simpan baris mana yang harus di update
+        }
+        noBaris++;
+    }
+    buku.close();
+
+    if(!temukanbuku){
+        cout << "ID buku tidak ditemukan!\n";
+        return;
+    }
+
+    if(stok <= 0){
+        cout << "Stok buku kosong!\n";
+        return;
+    }
+
+    // ===== KURANGI STOK =====
+    stringstream s(semuaBaris[barisTarget]);
+    vector<string> kolom;
+    string isi;
+
+    while(getline(s, isi, '|')) {
+        kolom.push_back(isi);
+    }
+
+    int stokBaru = stok - 1;
+    kolom[6] = to_string(stokBaru);
+
+    string barisBaru = kolom[0];
+    for (int i = 1; i < kolom.size(); i++){
+        barisBaru += "|" + kolom[i];
+    }
+
+    semuaBaris[barisTarget] = barisBaru;
+
+    ofstream out("data/buku.txt");
+    for(string &b : semuaBaris){
+        out << b << "\n";
+    }
+    out.close();
+ };
+ 
 void CariPinjaman(){ cout<<"[belum dibuat]\n"; }
 void PengembalianBuku(){ cout<<"[belum dibuat]\n"; }
 void HapusBuku(){ cout<<"[ belum dibuat]\n"; }
