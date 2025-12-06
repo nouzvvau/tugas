@@ -627,7 +627,60 @@ void TambahPinjaman(){
  };
  
 void CariPinjaman(){ cout<<"[belum dibuat]\n"; }
-void PengembalianBuku(){ cout<<"[belum dibuat]\n"; }
+void PengembalianBuku(){ 
+    const int batasHari = 7;       // Batas peminjaman buku (hari)
+    const int dendaPerHari = 1000; // Denda per hari (Rp)
+
+    string nama, judul, status, ID;
+    int hariPinjam;
+
+    // Ambil tanggal sekarang
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    int tanggalHariIni = ltm->tm_mday;
+    int bulan = 1 + ltm->tm_mon;
+    int tahun = 1900 + ltm->tm_year;
+
+    cout << "Tanggal hari ini: " << tanggalHariIni << "/" << bulan << "/" << tahun << endl;
+
+    // Input data peminjam
+    cout << "Masukkan ID peminjaman : ";
+    getline(cin, ID);
+    cout << "Nama Peminjam          : ";
+    getline(cin, nama);
+    cout << "Judul buku             : ";
+    getline(cin, judul);
+    cout << "Berapa hari buku dipinjam : ";
+    cin >> hariPinjam;
+    cin.ignore();
+    cout << "Apakah buku akan dikembalikan? (ya/tidak): ";
+    getline(cin, status);
+
+    // Hitung tanggal pengembalian otomatis
+    int tanggalKembali = tanggalHariIni + hariPinjam;
+
+    cout << "\n=== DATA PENGEMBALIAN BUKU ===" << endl;
+    cout << "ID Peminjaman   : " << ID << endl;
+    cout << "Nama Peminjam   : " << nama << endl;
+    cout << "Judul Buku      : " << judul << endl;
+    cout << "Tanggal Pinjam  : " << tanggalHariIni << "/" << bulan << "/" << tahun << endl;
+    cout << "Lama Dipinjam   : " << hariPinjam << " hari" << endl;
+    cout << "Tanggal Kembali : " << tanggalKembali << "/" << bulan << "/" << tahun << endl;
+
+    if (status == "ya" || status == "Ya") {
+        if (hariPinjam > batasHari) {
+            int terlambat = hariPinjam - batasHari;
+            int denda = terlambat * dendaPerHari;
+            cout << "Terlambat     : " << terlambat << " hari" << endl;
+            cout << "Denda         : Rp" << denda << endl;
+        } else {
+            cout << "Tepat waktu   : tidak ada denda" << endl;
+        }
+            cout << "Status        : Dikembalikan" << endl;
+    } else {
+            cout << "Status        : Belum dikembalikan" << endl;
+    }
+ }
 void HapusBuku(){ cout<<"[ belum dibuat]\n"; }
 void UpdateStok(){ cout<<"[ belum dibuat]\n"; }
 void PinjamBuku(){ cout<<"[belum dibuat]\n"; }
