@@ -432,7 +432,61 @@ void CariBuku() {
     }
 }
 
-void CariAnggota(){ cout<<"[ belum dibuat]\n"; }
+void CariAnggota(){
+    string cariKode;
+    cout << "\n=====PENCARIAN ANGGOTA=====\n";
+    cout << "\nMasukkan kode anggota : ";
+    cin >> cariKode;
+    cin.ignore();
+
+    ifstream cari;
+    string baris;
+    bool ketemu = false;
+
+    cari.open("data/anggota.txt");
+    if(!cari){
+        cout << "File tidak bisa dibuka!" << endl;
+    }
+
+    while (getline(cari, baris))
+    {
+        //jika baris kosong maka lewati
+        if(baris.empty()){continue;}
+
+        stringstream ss(baris);
+        string id, kode, nama, alamat, ttl, email;
+        bool status;
+
+        getline(ss, id, '|');
+        getline(ss, kode, '|');
+        getline(ss, nama, '|');
+        getline(ss, alamat, '|');
+        getline(ss, ttl, '|');
+        getline(ss, email, '|');
+        string statusSTR;
+        getline(ss, statusSTR, '|');
+        status = (statusSTR == "1");
+
+        if (kode == cariKode) {
+            ketemu = true;
+            cout << "\n===== DATA ANGGOTA DITEMUKAN =====\n";
+            cout << "ID       : " << id << endl;
+            cout << "Kode     : " << kode << endl;
+            cout << "Nama     : " << nama << endl;
+            cout << "Alamat   : " << alamat << endl;
+            cout << "TTL      : " << ttl << endl;
+            cout << "Email    : " << email << endl;
+            cout << "Status   : " << (status ? "aktif" : "nonaktif") << endl;
+            cout << "----------------------------------------------" << endl;
+            break;
+        }
+    }
+
+    if (!ketemu) {
+        cout << "\nKode tidak ditemukan :(\n";
+    }
+    cari.close();
+};
 void TambahPinjaman(){ cout<<"[ belum dibuat]\n"; }
 void CariPinjaman(){ cout<<"[belum dibuat]\n"; }
 void PengembalianBuku(){ cout<<"[belum dibuat]\n"; }
