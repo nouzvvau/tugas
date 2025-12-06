@@ -633,9 +633,17 @@ void UpdateStok(){ cout<<"[ belum dibuat]\n"; }
 void PinjamBuku(){ cout<<"[belum dibuat]\n"; }
 
 int main (){
+    system("chcp 65001 >nul");
     int pilihan1, pilihan, pilihan2;
 
-    cout << "===== MENU LOGIN =====\n";
+    cout << "\033[36m";     //cyan
+    cout << R"(                                                                                                                                
+█████▄ ▄▄▄▄▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄  ▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄ ▄▄  ▄▄▄   ▄▄▄  ▄▄  ▄▄ 
+██▄▄█▀ ██▄▄  ██▄█▄ ██▄█▀ ██ ██ ███▄▄   ██  ██▀██ ██▄█▀ ██▀██ ██▀██ ███▄██ 
+██     ██▄▄▄ ██ ██ ██    ▀███▀ ▄▄██▀   ██  ██▀██ ██ ██ ██▀██ ██▀██ ██ ▀██ 
+                                                                           )" << endl;
+    cout << "═════════════════════════════════════════════════════════════════════════\n" << "\033[0m";
+    cout << "===== LOGIN =====\n";
     cout << "1. PETUGAS\n";
     cout << "2. ANGGOTA\n";
     cout << "Masukkan pilihan: ";
@@ -643,7 +651,9 @@ int main (){
 
     if (pilihan1 == 1) {
         do {
-            cout << "\n===== MENU PERPUSTAKAAN =====\n";
+            cout << "\n\n=============================\n";
+            cout << "      MENU PERPUSTAKAAN      \n";
+            cout << "-----------------------------\n";
             cout << "1. Tambah Buku\n";
             cout << "2. Cari Buku\n";
             cout << "3. Tambah Anggota\n";
@@ -655,9 +665,9 @@ int main (){
             cout << "9. Hapus Buku\n";
             cout << "10. Update Stok Buku\n";
             cout << "11. Manajemen Petugas\n";
-            cout << "12. Keluar\n";
-            cout << "=====================================\n";
-            cout << "Pilih Menu (1-12): ";
+            cout << "0. Keluar\n";
+            cout << "=============================\n\n";
+            cout << "PILIH MENU: ";
             cin >> pilihan;
 
             switch(pilihan) {
@@ -679,7 +689,7 @@ int main (){
                     else if(p2==2) tampilPetugas();
                     break;
                 }
-                case 12: cout << "Keluar...\n"; break;
+                case 0: cout << "Keluar...\n"; break;
                 default: cout << "Pilihan tidak valid!\n";
             }
 
@@ -688,17 +698,19 @@ int main (){
 
     else if (pilihan1 == 2) {
         do{
-            cout << "\n===== MENU ANGGOTA =====\n";
+            cout << "\n\n========================\n";
+            cout << "      MENU ANGGOTA      \n";
+            cout << "------------------------\n";
             cout << "1. Cari Buku\n";
             cout << "2. Tampil Buku\n";
-            cout << "3. Keluar\n";
+            cout << "0. Keluar\n";
             cout << "Masukkan pilihan: ";
             cin >> pilihan2;
 
             switch(pilihan2){
                 case 1: CariBuku(); break;
                 case 2: TampilBuku(); break;
-                case 3: cout<<"Keluar...\n"; break;
+                case 0: cout<<"Keluar...\n"; break;
                 default: cout<<"Pilihan tidak valid!\n";
             }
 
