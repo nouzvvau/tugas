@@ -385,11 +385,11 @@ void TampilBuku() {
 
 void CariBuku() {
     string key;
-    cout << "Masukkan kata kunci: ";
+    cout << "Masukkan ID atau Judul buku: ";
     getline(cin, key);
 
     ifstream cari("buku.txt");
-    string baris; //membaca baris
+    string baris;
     bool ketemu = false;
 
     if (!cari.is_open()) {
@@ -398,29 +398,29 @@ void CariBuku() {
     }
 
     while (getline(cari, baris)) {
-        if (baris.find(key) != string::npos) {
+        if (baris.empty()) continue;
 
-            // Baca detail dari baris
-            stringstream ss(baris);
-            string judul, id, isbn, pengarang, penerbit, tahun, stok;
+        stringstream ss(baris);
+        string judul, id, isbn, pengarang, penerbit, tahun, stok;
 
-            getline(ss, judul, '|');
-            getline(ss, id, '|');
-            getline(ss, isbn, '|');
-            getline(ss, pengarang, '|');
-            getline(ss, penerbit, '|');
-            getline(ss, tahun, '|');
-            getline(ss, stok, '|');
+        getline(ss, judul, '|');
+        getline(ss, id, '|');
+        getline(ss, isbn, '|');
+        getline(ss, pengarang, '|');
+        getline(ss, penerbit, '|');
+        getline(ss, tahun, '|');
+        getline(ss, stok, '|');
 
+        // Cari berdasarkan ID ATAU judul
+        if (id == key || judul == key) {
             cout << "\n=== Buku Ditemukan ===\n";
-            cout << "Judul     : " << judul << "\n";
-            cout << "ID        : " << id << "\n";
-            cout << "ISBN      : " << isbn << "\n";
-            cout << "Pengarang : " << pengarang << "\n";
-            cout << "Penerbit  : " << penerbit << "\n";
-            cout << "Tahun     : " << tahun << "\n";
-            cout << "Stok      : " << stok << "\n";
-
+            cout << "Judul     : " << judul << endl;
+            cout << "ID        : " << id << endl;
+            cout << "ISBN      : " << isbn << endl;
+            cout << "Pengarang : " << pengarang << endl;
+            cout << "Penerbit  : " << penerbit << endl;
+            cout << "Tahun     : " << tahun << endl;
+            cout << "Stok      : " << stok << endl;
             ketemu = true;
         }
     }
@@ -428,7 +428,7 @@ void CariBuku() {
     cari.close();
 
     if (!ketemu) {
-        cout << "Kata kunci tidak ditemukan.\n";
+        cout << "Buku tidak ditemukan.\n";
     }
 }
 
