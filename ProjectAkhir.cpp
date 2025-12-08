@@ -490,7 +490,7 @@ void CariAnggota(){
 
 void TambahPinjaman(){ 
     string ID_anggota;
-    cout << "=== TAMBAHKAN PINJAMAN! ===\n";
+    cout << "\n=== TAMBAHKAN PINJAMAN! ===\n";
     cout << "Masukkan ID anggota: ";
     cin >> ID_anggota;
 
@@ -542,12 +542,12 @@ void TambahPinjaman(){
 
     // ===== PEMINJAMAN BUKU =====
     string ID_buku;
-    cout << "\nMasukkan ID buku yang ingin dipinjam: \n";
+    cout << "\nMasukkan ID buku yang ingin dipinjam: ";
     cin >> ID_buku;
     //  buke file buku.txt
     ifstream buku("data/buku.txt");
     if(!buku.is_open()){
-        cout << "file tidak ditemukan!\n";
+        cout << "\nFile tidak ditemukan!\n";
         return;
     }
     bool temukanbuku = false;
@@ -591,35 +591,35 @@ void TambahPinjaman(){
     buku.close();
 
     if(!temukanbuku){
-        cout << "ID buku tidak ditemukan!\n";
+        cout << "\nID buku tidak ditemukan!\n";
         return;
     }
 
     if(stok <= 0){
-        cout << "Stok buku kosong!\n";
+        cout << "\nStok buku kosong!\n";
         return;
     }
 
     // ===== KURANGI STOK =====
     stringstream s(semuaBaris[barisTarget]);
-    vector<string> kolom;
-    string isi;
+    vector<string> kolomm;
+    string isii;
 
-    while(getline(s, isi, '|')) {
-        kolom.push_back(isi);
+    while(getline(s, isii, '|')) {
+        kolomm.push_back(isii);
     }
 
     int stokBaru = stok - 1;
-    kolom[6] = to_string(stokBaru);
+    kolomm[6] = to_string(stokBaru);
 
-    string barisBaru = kolom[0];
-    for (int i = 1; i < kolom.size(); i++){
-        barisBaru += "|" + kolom[i];
+    string barisBaru = kolomm[0];
+    for (int i = 1; i < kolomm.size(); i++){
+        barisBaru += "|" + kolomm[i];
     }
 
     semuaBaris[barisTarget] = barisBaru;
 
-    ofstream out("data/buku.txt");
+    ofstream out("data/buku.txt"); //tulis ulang baris
     for(string &b : semuaBaris){
         out << b << "\n";
     }
