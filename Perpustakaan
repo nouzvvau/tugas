@@ -813,7 +813,6 @@ void PengembalianBuku() {
 
 
     //BELOM DI KERJAIN //
-void TambahPinjaman(){ cout<<"[ belum dibuat]\n"; }
 void CariPinjaman(){ cout<<"[belum dibuat]\n"; }
 void HapusBuku(){ cout<<"[ belum dibuat]\n"; }
 void UpdateStok(){ cout<<"[ belum dibuat]\n"; }
