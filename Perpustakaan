@@ -821,9 +821,17 @@ void BukuYangBelumKembali(){ cout<<"[ belum dibuat]\n"; }
 
 
 int main() {
+    system("chcp 65001 >nul");
     int pilihan1, pilihan, pilihan2;
 
-    cout << "===== MENU LOGIN =====\n";
+    cout << "\033[36m";     //cyan
+    cout << R"(
+█████▄ ▄▄▄▄▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄  ▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄ ▄▄  ▄▄▄   ▄▄▄  ▄▄  ▄▄
+██▄▄█▀ ██▄▄  ██▄█▄ ██▄█▀ ██ ██ ███▄▄   ██  ██▀██ ██▄█▀ ██▀██ ██▀██ ███▄██
+██     ██▄▄▄ ██ ██ ██    ▀███▀ ▄▄██▀   ██  ██▀██ ██ ██ ██▀██ ██▀██ ██ ▀██
+                                                                           )" << endl;
+    cout << "═════════════════════════════════════════════════════════════════════════\n" << "\033[0m";
+    cout << "===== LOGIN =====\n";
     cout << "1. PETUGAS\n";
     cout << "2. ANGGOTA\n";
     cout << "Masukkan pilihan: ";
