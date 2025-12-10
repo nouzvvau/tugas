@@ -84,7 +84,7 @@ void loginPetugas() {
 
     void loginAnggota() {
     string jeneng, pw, cek;
-    string id, kode, nama, alamat, ttl, email;
+    string kode, nama, alamat, ttl, email;
     bool status;
 
     while (true) {
@@ -109,7 +109,6 @@ void loginPetugas() {
             if (cek.empty()) continue;
 
             stringstream ss(cek);
-            getline(ss, id, '|');
             getline(ss, kode, '|');
             getline(ss, nama, '|');
             getline(ss, alamat, '|');
@@ -299,8 +298,6 @@ void TambahAnggota(){
 
     cout << "===== MENAMBAHKAN ANGGOTA =====\n";
 
-    u.id = to_string(getLastIDAnggota()); // FIX
-
     cout << "Masukkan nama lengkap: ";
     getline(cin, u.nama);
 
@@ -370,7 +367,7 @@ if(!file){
     return;
 }
 
-file << u.id << "|" << u.kode << "|" << u.nama << "|" << u.alamat << "|"
+file << u.kode << "|" << u.nama << "|" << u.alamat << "|"
      << u.ttl << "|" << u.email << "|" << u.status << endl;
 
 file.close();
@@ -397,7 +394,6 @@ void TampilAnggota() {
         Anggota u;
         string statusSTR;
 
-        getline(ss, u.id, '|');
         getline(ss, u.kode, '|');
         getline(ss, u.nama, '|');
         getline(ss, u.alamat, '|');
@@ -417,8 +413,7 @@ void TampilAnggota() {
 
     cout << "\n===== DATA ANGGOTA =====\n";
     for (auto &u : daftarAnggota) {
-        cout << "\nID        : " << u.id
-             << "\nKode      : " << u.kode
+        cout << "\nKode      : " << u.kode
              << "\nNama      : " << u.nama
              << "\nAlamat    : " << u.alamat
              << "\nTTL       : " << u.ttl
@@ -449,7 +444,6 @@ void CariAnggota() {
         Anggota u;
         string statusSTR;
 
-        getline(ss, u.id, '|');
         getline(ss, u.kode, '|');
         getline(ss, u.nama, '|');
         getline(ss, u.alamat, '|');
@@ -462,8 +456,7 @@ void CariAnggota() {
         if (u.kode == kodeCari) {
             ditemukan = true;
             cout << "\n===== DATA ANGGOTA =====\n";
-            cout << "\nID        : " << u.id
-                 << "\nKode      : " << u.kode
+            cout << "\nKode      : " << u.kode
                  << "\nNama      : " << u.nama
                  << "\nAlamat    : " << u.alamat
                  << "\nTTL       : " << u.ttl
@@ -845,7 +838,7 @@ void UpdateStok() {
 }
 
 //Cari anggota
-bool cariAnggota(string id) {
+bool cariAnggota(string kd) {
     ifstream file("anggota.txt");
     string line;
 
@@ -853,16 +846,15 @@ bool cariAnggota(string id) {
         if (line.empty()) continue;
 
         stringstream ss(line);
-        string idFile, kode, nama, alamat, ttl, email, statusSTR;
-        getline(ss, idFile, '|');
-        getline(ss, kode, '|'); // skip kode
-        getline(ss, nama, '|'); // skip nama
+        string kode, nama, alamat, ttl, email, statusSTR;
+        getline(ss, kode, '|');
+        getline(ss, nama, '|');
         getline(ss, alamat, '|');
         getline(ss, ttl, '|');
         getline(ss, email, '|');
         getline(ss, statusSTR, '|');
 
-        if (idFile == id) return true;
+        if (kd == kode) return true;
     }
     return false;
 }
@@ -939,7 +931,7 @@ string generateIDPinjaman() {
 
 // FUNGSI PINJAM BUKU (UTAMA)
 void pinjamBuku() {
-    string idAnggota, idBuku, judul;
+    string kode, idBuku, judul;
     int stok;
 
     cout << "\n=== MENU PINJAM BUKU ===\n";
@@ -950,10 +942,10 @@ void pinjamBuku() {
 
     // Cari anggota
     while (true) {
-        cout << "Masukkan ID Anggota: ";
-        cin >> idAnggota;
+        cout << "Masukkan  Kode: ";
+        cin >> kode;
 
-        if (cariAnggota(idAnggota)) {
+        if (cariAnggota(kode)) {
             cout << "Anggota ditemukan!\n";
             break;
         } else {
@@ -990,12 +982,12 @@ void pinjamBuku() {
 
     // Simpan data peminjaman
     ofstream out("peminjaman.txt", ios::app);
-    out<< idPinjam << "|" << idAnggota << "|" << idBuku << "|" << judul<< "|" << tanggalpnjam << "|" <<  "0" << "|" << "Belum dikembalikan"<<"|"<<"Tanggal pengembalian"<<endl; // denda nanti dihitung saat pengembalian
+    out<< idPinjam << "|" << idBuku << "|" << judul<< "|" << tanggalpnjam << "|" <<  "0" << "|" << "Belum dikembalikan"<<"|"<<"Tanggal pengembalian"<<endl; // denda nanti dihitung saat pengembalian
     out.close();
 
     cout << "\n=== PEMINJAMAN BERHASIL ===\n";
     cout << "ID Peminjaman: " << idPinjam << endl;
-    cout << "Anggota       : " << idAnggota << endl;
+    cout << "Anggota       : " << kode << endl;
     cout << "Buku          : " << judul << endl;
     cout << "Tanggal Pinjam: " << tanggalpnjam<< endl;
 
@@ -1023,7 +1015,6 @@ void PengembalianBuku() {
         stringstream ss(line);
         string curID, idAnggota, idBuku, judul, tglpjm, dendaStr, status, tglKembali;
         getline(ss, curID, '|'); //IDPEMINJAMAN
-        getline(ss, idAnggota, '|');
         getline(ss, idBuku, '|');
         getline(ss, judul, '|');
         getline(ss, tglpjm, '|');
@@ -1042,7 +1033,6 @@ void PengembalianBuku() {
 
             cout << "\n=== Data Peminjaman ===\n";
             cout << "ID Peminjaman  : " << curID << "\n";
-            cout << "ID Anggota     : " << idAnggota << "\n";
             cout << "ID Buku        : " << idBuku << "\n";
             cout << "Judul Buku     : " << judul << "\n";
             cout << "Tanggal Pinjam : " << tglpjm << "\n";
@@ -1145,7 +1135,6 @@ while (getline(file, baris)) {
     string idpeminjaman, idanggota, idbuku, judulbuku, tanggalpinjam, denda, status, tglpengembalian;
 
     getline(ss, idpeminjaman, '|');
-    getline(ss, idanggota, '|');
     getline(ss, idbuku, '|');
     getline(ss, judulbuku, '|');
     getline(ss, tanggalpinjam, '|');
