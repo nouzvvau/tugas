@@ -1085,10 +1085,10 @@ cout<< "BUKU YANG BELUM DIKEMBALIKAN "<< endl ;
 while (getline(file,baris)){
 
     stringstream ss(baris);
-string idpeminjaman, idanggota, idbuku, nama, tangglpinjam, denda, status;
+string idpeminjaman, kode, idbuku, nama, tangglpinjam, denda, status;
 
     getline(ss, idpeminjaman, '|');
-    getline(ss, idanggota, '|');
+    getline(ss, kode, '|');
     getline(ss, idbuku, '|');
     getline(ss, nama, '|');
     getline(ss, tangglpinjam, '|');
@@ -1098,7 +1098,7 @@ string idpeminjaman, idanggota, idbuku, nama, tangglpinjam, denda, status;
         if(status == "Belum dikembalikan"){
 
             cout<<"Id Peminjaman: "<<idpeminjaman <<endl;
-            cout << "Id Anggota : "<< idanggota << endl;
+            cout << "Kode Anggota : "<< kode << endl;
             cout << "Id Buku : " << idbuku<<endl;
             cout << "Nama Peminjam : "<< nama << endl;
             cout << "Tanggal Pinjam :"<< tangglpinjam << endl;
@@ -1132,9 +1132,10 @@ while (getline(file, baris)) {
     if (baris.empty()) continue;
 
     stringstream ss(baris);
-    string idpeminjaman, idanggota, idbuku, judulbuku, tanggalpinjam, denda, status, tglpengembalian;
+    string idpeminjaman, kode, idbuku, judulbuku, tanggalpinjam, denda, status, tglpengembalian;
 
     getline(ss, idpeminjaman, '|');
+    getline(ss, kode, '|');
     getline(ss, idbuku, '|');
     getline(ss, judulbuku, '|');
     getline(ss, tanggalpinjam, '|');
@@ -1142,11 +1143,11 @@ while (getline(file, baris)) {
     getline(ss, status, '|');
     getline(ss, tglpengembalian, '|');
 
-    if (idpeminjaman == key || judulbuku == key||idanggota==key) {
+    if (idpeminjaman == key || judulbuku == key||kode==key) {
         ketemu = true;
         cout << "\n=== Peminjaman Ditemukan ===\n";
         cout << "ID Peminjaman        : " << idpeminjaman << "\n";
-        cout << "ID Anggota           : " << idanggota << "\n";
+        cout << "Kode Anggota         : " << kode << "\n";
         cout << "ID Buku              : " << idbuku << "\n";
         cout << "Judul Buku           : " << judulbuku << "\n";
         cout << "Tanggal Pinjam       : " << tanggalpinjam << "\n";
@@ -1181,6 +1182,7 @@ int main() {
         cin >> pilihan1;
 
         if (pilihan1 == 1) {
+
             loginPetugas();
             int pilihan;
 
