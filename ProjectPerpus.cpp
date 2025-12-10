@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <sstream>
@@ -36,7 +35,21 @@ void loginPetugas() {
     cout << "Masukkan username: ";
     cin >> us;
     cout << "Masukkan password: ";
-    cin >> pw;
+    pw = "";
+    char ch;
+    while (true) {
+        ch = _getch(); // baca karakter tanpa menampilkan di layar
+        if (ch == 13) break; // enter
+        else if (ch == 8) { // backspace
+            if (!pw.empty()) {
+                pw.pop_back();
+                cout << "\b \b"; // hapus * di layar
+            }
+        } else {
+            pw.push_back(ch);
+            cout << "*";
+        }
+    }
     ifstream file("petugas.txt");
     if (!file.is_open()) {
         cout << "\nFile tidak bisa dibuka!\n";
@@ -69,8 +82,7 @@ void loginPetugas() {
     }
 }
 
-
-void loginAnggota() {
+    void loginAnggota() {
     string jeneng, pw, cek;
     string id, kode, nama, alamat, ttl, email;
     bool status;
@@ -558,7 +570,7 @@ if (!lastLine.empty()) {
 char ulang;
 cout << "Tambah buku lagi??(y/n) : ";
 cin >> ulang;
- if (ulang != 'y' || ulang != 'Y'){
+ if (ulang != 'y' && ulang != 'Y'){
 break;
  }
  }
@@ -1074,7 +1086,7 @@ void PengembalianBuku() {
 void BukuYangBelumKembali () {
 ifstream file("peminjaman.txt");
     if(!file.is_open()) {
-    cout << "Tidak bisa dibuka";
+    cout << "Tidak bisa dibuka" << endl;
 
 }
 string baris;
@@ -1162,39 +1174,40 @@ file.close();
 
 int main() {
     system("chcp 65001 >nul");
-    int pilihan1, pilihan, pilihan2;
+    int pilihan1;
 
-    cout << "\033[36m";     //cyan
-    cout << R"(
+    while (true) { // loop utama untuk menu login
+        cout << "\033[36m";
+        cout << R"(
 █████▄ ▄▄▄▄▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄  ▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄  ▄▄ ▄▄  ▄▄▄   ▄▄▄  ▄▄  ▄▄
 ██▄▄█▀ ██▄▄  ██▄█▄ ██▄█▀ ██ ██ ███▄▄   ██  ██▀██ ██▄█▀ ██▀██ ██▀██ ███▄██
 ██     ██▄▄▄ ██ ██ ██    ▀███▀ ▄▄██▀   ██  ██▀██ ██ ██ ██▀██ ██▀██ ██ ▀██
                                                                            )" << endl;
-    cout << "═════════════════════════════════════════════════════════════════════════\n" << "\033[0m";
-    cout << "===== LOGIN =====\n";
-    cout << "1. PETUGAS\n";
-    cout << "2. ANGGOTA\n";
-    cout << "Masukkan pilihan: ";
-    cin >> pilihan1;
+        cout << "═════════════════════════════════════════════════════════════════════════\n" << "\033[0m";
+        cout << "===== LOGIN =====\n";
+        cout << "1. PETUGAS\n";
+        cout << "2. ANGGOTA\n";
+        cout << "0. KELUAR\n";
+        cout << "Masukkan pilihan: ";
+        cin >> pilihan1;
 
+        if (pilihan1 == 1) {
+            loginPetugas();
+            int pilihan;
 
-    if (pilihan1 == 1) {
-    loginPetugas();
+            do {
+                cout << "\n===== MENU PERPUSTAKAAN =====\n";
+                cout << "1. Manajemen Petugas\n";
+                cout << "2. Manajemen Anggota\n";
+                cout << "3. Manajemen Buku\n";
+                cout << "4. Manajemen Peminjaman Dan Pengembalian\n";
+                cout << "5. Keluar\n";
+                cout << "=====================================\n";
+                cout << "Pilih Menu (1-5): ";
+                cin >> pilihan;
 
-        do {
-            cout << "\n===== MENU PERPUSTAKAAN =====\n";
-            cout << "1. Manajemen Petugas\n";
-            cout << "2. Manajemen Anggota\n";
-            cout << "3. Manajemen Buku\n";
-            cout << "4. Manajemen Peminjaman Dan Pengembalian\n";
-            cout << "5. Keluar\n";
-            cout << "=====================================\n";
-            cout << "Pilih Menu (1-5): ";
-            cin >> pilihan;
-
-            switch(pilihan) {
-
-                //================ MENUPETUGAS ================
+                switch(pilihan) {
+                                    //================ MENUPETUGAS ================
                 case 1: {
                     int p2;
                     do {
@@ -1214,9 +1227,7 @@ int main() {
                     } while(p2 != 0);
                     break;
                 }
-
-                //================ MENU ANGGOTA ================
-                case 2: {
+                                case 2: {
                     int p2;
                     do {
                         cout << "\n=== Manajemen Anggota ===\n";
@@ -1290,44 +1301,40 @@ int main() {
                     break;
                 }
 
-                case 5:
-                    cout << "Keluar dari menu Petugas...\n";
-                    break;
 
-                default:
-                    cout << "Pilihan tidak valid!\n";
+                }
+
+            } while (pilihan != 5); // Logout akan kembali ke menu login
+        }
+        else if (pilihan1 == 2) {
+            loginAnggota();
+            int pilihan2;
+
+            do {
+                cout << "\n===== MENU ANGGOTA =====\n";
+                cout << "1. Cari Buku\n";
+                cout << "2. Tampil Buku\n";
+                cout << "3. Keluar\n";
+                cout << "Masukkan pilihan: ";
+                cin >> pilihan2;
+
+                switch(pilihan2) {
+                    case 1: CariBuku(); break;
+                    case 2: TampilBuku(); break;
+                    case 3: cout << "Logout berhasil, kembali ke menu login...\n"; break;
+                    default: cout << "Pilihan tidak valid!\n";
+                }
+
+            } while(pilihan2 != 3); // Logout akan kembali ke menu login
+        }
+        else if (pilihan1 == 0) {
+            cout << "Terima kasih! Program selesai.\n";
+            break;
             }
-
-        } while(pilihan != 5);
+        else {
+            cout << "Pilihan tidak valid! Silakan coba lagi.\n";
+        }
     }
 
-    //================ MENU ANGGOTA ====================
-    else if (pilihan1 == 2) {
-
-        loginAnggota();
-
- do {
- int pilihan2;
-
-            cout << "\n===== MENU ANGGOTA =====\n";
-            cout << "1. Cari Buku\n";
-            cout << "2. Tampil Buku\n";
-            cout << "3. Keluar\n";
-            cout << "Masukkan pilihan: ";
-            cin >> pilihan2;
-
-            switch(pilihan2) {
-                case 1: CariBuku(); break;
-                case 2: TampilBuku(); break;
-                case 3: cout << "Keluar dari menu Anggota...\n"; break;
-                default: cout << "Pilihan tidak valid!\n";
-            }
-
-        } while(pilihan2 != 3);
-
-
-
-    }
-
-return 0;
-    }
+    return 0;
+}
