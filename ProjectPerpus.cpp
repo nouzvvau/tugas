@@ -515,8 +515,8 @@ void TambahBuku()
     cin>>a.stok;
     cout<<"Status: ";
     cin >> a.status;
-    cin.ignore();
-cout<<endl;
+
+    cout<<endl;
     //ID Buku
 
     //ambil ID terakhir
@@ -758,8 +758,6 @@ void UpdateStok() {
     }
 }
 
-
-
    void HapusBuku() {
     string idBuku;
     cout << "Masukkan ID Buku yang ingin dihapus: ";
@@ -886,7 +884,6 @@ bool cariBuku(string idBuku, string &judul, int &stok) {
     return false;
 }
 
-
 // HITUNG DENDA (TELAT)
 // telat > 7 hari = (telat - 7) * 1000
 int hitungDenda(int hariPinjam) {
@@ -929,9 +926,9 @@ string generateIDPinjaman() {
     cout<<id;
 }
 
-// FUNGSI PINJAM BUKU (UTAMA)
+
 void pinjamBuku() {
-    string kode, idBuku, judul;
+    string kodeAnggota, idBuku, judul;
     int stok;
 
     cout << "\n=== MENU PINJAM BUKU ===\n";
@@ -942,10 +939,10 @@ void pinjamBuku() {
 
     // Cari anggota
     while (true) {
-        cout << "Masukkan  Kode: ";
-        cin >> kode;
+        cout << "Masukkan Kode Anggota: ";
+        cin >> kodeAnggota;
 
-        if (cariAnggota(kode)) {
+        if (cariAnggota(kodeAnggota)) {
             cout << "Anggota ditemukan!\n";
             break;
         } else {
@@ -970,108 +967,142 @@ void pinjamBuku() {
         }
     }
 
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+
+    int hari  = ltm->tm_mday;
+    int bulan = 1 + ltm->tm_mon;
+    int tahun = 1900 + ltm->tm_year;
+
+    cout << "Tanggal Pinjam: " << tahun << "-" << bulan << "-" << hari << endl;
     // Kurangi stok
     kurangiStok(idBuku);
-
-    //Input durasi jam
-    string tanggalpnjam;
-    cin.ignore();
-     cout << " Masukkan tanggal pinjam(YYYY-MM-DD) : ";
-     getline(cin,tanggalpnjam);
 
 
     // Simpan data peminjaman
     ofstream out("peminjaman.txt", ios::app);
-    out<< idPinjam << "|" << idBuku << "|" << judul<< "|" << tanggalpnjam << "|" <<  "0" << "|" << "Belum dikembalikan"<<"|"<<"Tanggal pengembalian"<<endl; // denda nanti dihitung saat pengembalian
+    out<< idPinjam << "|"<< kodeAnggota <<"|"<< idBuku << "|" << judul<< "|" << tahun << "-" << bulan << "-" << hari << "|" <<  "0" << "|" << "Belum dikembalikan"<<"|"<<"Tanggal pengembalian"<<endl; // denda nanti dihitung saat pengembalian
     out.close();
-
+//tampilkan
     cout << "\n=== PEMINJAMAN BERHASIL ===\n";
-    cout << "ID Peminjaman: " << idPinjam << endl;
-    cout << "Anggota       : " << kode << endl;
+    cout << "ID Peminjaman : " << idPinjam << endl;
+    cout << "Anggota       : " << kodeAnggota << endl;
     cout << "Buku          : " << judul << endl;
-    cout << "Tanggal Pinjam: " << tanggalpnjam<< endl;
+    cout << "Tanggal Pinjam: " << tahun << "-" << bulan << "-" << hari << endl;
 
 }
 
-// Pengembalian buku
+
+string getToday() {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+
+    int y = 1900 + ltm->tm_year;
+    int m = 1 + ltm->tm_mon;
+    int d = ltm->tm_mday;
+
+    char buffer[20];
+    sprintf(buffer, "%04d-%02d-%02d", y, m, d);
+
+    return string(buffer);
+}
+
+int hitungSelisihHari(string tglPinjam) {
+    int y, m, d;
+    sscanf(tglPinjam.c_str(), "%d-%d-%d", &y, &m, &d);
+
+    tm waktuPinjam = {};
+    waktuPinjam.tm_year = y - 1900;
+    waktuPinjam.tm_mon = m - 1;
+    waktuPinjam.tm_mday = d;
+
+    time_t timePinjam = mktime(&waktuPinjam);
+
+    time_t now = time(0);
+    tm* waktuNow = localtime(&now);
+    time_t timeNow = mktime(waktuNow);
+
+    double selisihDetik = difftime(timeNow, timePinjam);
+    return selisihDetik / 86400;
+}
 
 void PengembalianBuku() {
-    string idPinjam;
+    ifstream file("peminjaman.txt");
+
+    string idInput;
     cout << "Masukkan ID Peminjaman: ";
-    cin >> idPinjam;
+    cin >> idInput;
 
-    ifstream in("peminjaman.txt");
-    if (!in.is_open()) {
-        cout << "File peminjaman tidak ditemukan!\n";
-        return;
+    const int batasHari = 7;
+    const int dendaPerHari = 1000;
+
+    string line;
+    bool found = false;
+
+    // Simpan semua baris lama ke vector supaya bisa ditulis ulang
+    vector<string> semuaData;
+
+    while (getline(file, line)) {
+        semuaData.push_back(line);
     }
+    file.close();
 
-    string line, semuaData = "";
-    bool ketemu = false;
+    // Buka file lagi dengan ios::out (langsung kosongin)
+    ofstream output("peminjaman.txt", ios::out);
 
-    while (getline(in, line)) {
-        if (line.empty()) continue;
+    for (string &baris : semuaData) {
+        stringstream ss(baris);
 
-        stringstream ss(line);
-        string curID, idAnggota, idBuku, judul, tglpjm, dendaStr, status, tglKembali;
-        getline(ss, curID, '|'); //IDPEMINJAMAN
+        string id, kodeAnggota, idBuku, judul, tglPinjam, denda, status, tglKembali;
+        getline(ss, id, '|');
+        getline(ss, kodeAnggota, '|');
         getline(ss, idBuku, '|');
         getline(ss, judul, '|');
-        getline(ss, tglpjm, '|');
-        getline(ss, dendaStr, '|');
+        getline(ss, tglPinjam, '|');
+        getline(ss, denda, '|');
         getline(ss, status, '|');
         getline(ss, tglKembali, '|');
 
-        if (curID == idPinjam) {
-            ketemu = true;
+        if (id == idInput && status == "Belum dikembalikan") {
+            found = true;
 
-            if (status == "Sudah Dikembalikan") {
-                cout << "Buku ini sudah dikembalikan sebelumnya!\n";
-                semuaData += line + "\n";
-                continue;
+            int lama = hitungSelisihHari(tglPinjam);
+
+            int totalDenda = 0;
+            if (lama > batasHari) {
+                totalDenda = (lama - batasHari) * dendaPerHari;
             }
 
-            cout << "\n=== Data Peminjaman ===\n";
-            cout << "ID Peminjaman  : " << curID << "\n";
-            cout << "ID Buku        : " << idBuku << "\n";
-            cout << "Judul Buku     : " << judul << "\n";
-            cout << "Tanggal Pinjam : " << tglpjm << "\n";
+            string today = getToday();
 
-            string tglPengembalian;
-            cout << "Masukkan tanggal pengembalian (YYYY-MM-DD): ";
-            cin >> tglPengembalian;
-            int lamaPinjam;
-            cout<<"Berapa lama dipinjam? ";
-            cin>> lamaPinjam;
+            output << id << "|"
+                   << kodeAnggota << "|"
+                   << idBuku << "|"
+                   << judul << "|"
+                   << tglPinjam << "|"
+                   << totalDenda << "|"
+                   << "Sudah dikembalikan" << "|"
+                   << today << "\n";
 
+            cout << "\n=== DATA DIUPDATE ===\n";
+            cout << "Judul: " << judul << "\n";
+            cout << "Tanggal Pinjam: " << tglPinjam << "\n";
+            cout << "Hari dipinjam: " << lama << "\n";
+            cout << "Denda: Rp" << totalDenda << "\n";
+            cout << "Status: Sudah dikembalikan\n";
+            cout << "Tanggal kembali: " << today << "\n";
 
-            int denda = hitungDenda(lamaPinjam);
-
-            // Update line: tambahkan tanggal pengembalian, denda, status
-            stringstream updated;
-            updated << curID << "|" << idAnggota << "|" << idBuku << "|" << judul
-                    << "|" << tglpjm << "|" << denda << "|Sudah Dikembalikan|" << tglPengembalian;
-
-            semuaData += updated.str() + "\n";
-
-            cout << "\nBuku berhasil dikembalikan!\n";
-            cout << "Denda: Rp " << denda << "\n";
         } else {
-            semuaData += line + "\n";
+            output << baris << "\n";
         }
     }
-    in.close();
 
-    if (!ketemu) {
-        cout << "ID Peminjaman tidak ditemukan!\n";
-        return;
+    output.close();
+
+    if (!found) {
+        cout << "ID peminjaman tidak ditemukan atau sudah dikembalikan.\n";
     }
-
-    ofstream out("peminjaman.txt");
-    out << semuaData;
-    out.close();
 }
-
 
 void BukuYangBelumKembali () {
 ifstream file("peminjaman.txt");
@@ -1081,7 +1112,7 @@ ifstream file("peminjaman.txt");
 }
 string baris;
 bool ada = false;
-cout<< "BUKU YANG BELUM DIKEMBALIKAN "<< endl ;
+cout<< "BUKU YANG BELUM DIKEMBALIKAN "<< endl<<endl ;
 while (getline(file,baris)){
 
     stringstream ss(baris);
@@ -1183,7 +1214,7 @@ int main() {
 
         if (pilihan1 == 1) {
 
-            loginPetugas();
+           loginPetugas();
             int pilihan;
 
             do {
