@@ -6,6 +6,7 @@
 #include <sstream>
 #include <conio.h>
 #include <algorithm>
+#include <limits>
 
 using namespace std;
 
@@ -33,7 +34,9 @@ void loginPetugas() {
 
     cout << "\n===== Login Petugas =====\n";
     cout << "Masukkan username: ";
-    cin >> us;
+    cin.ignore();
+    getline( cin, us);
+
     cout << "Masukkan password: ";
     pw = "";
     char ch;
@@ -227,7 +230,8 @@ void TambahPetugas() {
 
   cout << "\nData petugas berhasil di simpan!\n";
 
-}
+};
+
 // Tampil Petugas
 void TampilPetugas() {
     ifstream file("petugas.txt");
@@ -240,7 +244,7 @@ void TampilPetugas() {
     string line;
     cout << "\n=== DAFTAR PETUGAS ===\n";
     cout << "ID\tUsername\tPassword\tNama\n";
-    cout << "---------------------------------------------";
+    cout << "---------------------------------------------"<< endl;
 
     while (getline(file, line)) {
         stringstream ss(line);
@@ -291,6 +295,38 @@ int getLastIDAnggota() {
     return lastID + 1; // BUKAN memanggil dirinya sendiri
 }
 
+bool validTanggal(const string &ttl) {
+    // Cari bagian tanggal setelah koma
+    size_t pos = ttl.find(",");
+    if (pos == string::npos) return false;
+
+    string tgl = ttl.substr(pos + 2); // ambil bagian YYYY-MM-DD
+
+    // Format harus tepat 10 karakter
+    if (tgl.length() != 10) return false;
+    if (tgl[4] != '-' || tgl[7] != '-') return false;
+
+    // Ambil angka
+    int tahun  = stoi(tgl.substr(0, 4));
+    int bulan  = stoi(tgl.substr(5, 2));
+    int hari   = stoi(tgl.substr(8, 2));
+
+    // Validasi bulan
+    if (bulan < 1 || bulan > 12) return false;
+
+    // Jumlah hari tiap bulan
+    int hariPerBulan[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+    // Cek tahun kabisat → Februari = 29
+    bool kabisat = (tahun % 4 == 0 && tahun % 100 != 0) || (tahun % 400 == 0);
+    if (kabisat) hariPerBulan[1] = 29;
+
+    // Validasi hari
+    if (hari < 1 || hari > hariPerBulan[bulan - 1]) return false;
+
+    return true;
+}
+
 //Manajemen Anggota
 void TambahAnggota(){
     Anggota u;
@@ -304,8 +340,13 @@ void TambahAnggota(){
     cout << "Masukkan alamat: ";
     getline(cin, u.alamat);
 
-    cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
-    getline(cin, u.ttl);
+    while(true){
+        cout << "Masukkan ttl (Tempat, YYYY-MM-DD): ";
+        getline(cin, u.ttl);
+        if(validTanggal(u.ttl)) break;
+
+        cout << "\nFormat tanggal tidak valid!\n";
+    }
 
     cout << "Masukkan email: ";
     getline(cin, u.email);
@@ -647,7 +688,7 @@ void CariBuku() {
     bool ketemu = false;
 
     cout << "Masukkan judul atau ID buku: ";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
     getline(cin, key);
 
     ifstream file("buku.txt");
@@ -685,13 +726,13 @@ void CariBuku() {
             cout << "Stok      : " << stok << endl;
             cout << "-----------------------------\n";
             ketemu = true;
-        }
+        } 
         }
     }
-
-    if (!ketemu) {
-        cout << "Buku tidak ditemukan\n";
-    }
+if (!ketemu){
+    cout<<"tidak ketemu";
+}
+    
 
     file.close();
 
@@ -1116,25 +1157,25 @@ cout<< "BUKU YANG BELUM DIKEMBALIKAN "<< endl<<endl ;
 while (getline(file,baris)){
 
     stringstream ss(baris);
-string idpeminjaman, kode, idbuku, nama, tangglpinjam, denda, status;
+    string idpeminjaman, kode, idbuku, buku, tangglpinjam, denda, status;
 
     getline(ss, idpeminjaman, '|');
     getline(ss, kode, '|');
     getline(ss, idbuku, '|');
-    getline(ss, nama, '|');
+    getline(ss, buku, '|');
     getline(ss, tangglpinjam, '|');
     getline(ss, denda, '|');
     getline(ss, status, '|');
 
         if(status == "Belum dikembalikan"){
 
-            cout<<"Id Peminjaman: "<<idpeminjaman <<endl;
-            cout << "Kode Anggota : "<< kode << endl;
-            cout << "Id Buku : " << idbuku<<endl;
-            cout << "Nama Peminjam : "<< nama << endl;
-            cout << "Tanggal Pinjam :"<< tangglpinjam << endl;
-            cout<< "Status : "<< status<< endl;
-            cout<<"-------------------------------------------\n";
+            cout<< "Id Peminjaman  : "<<idpeminjaman <<endl;
+            cout<< "Kode Anggota   : "<< kode << endl;
+            cout<< "Id Buku        : "<< idbuku<<endl;
+            cout<< "Judul buku     : "<< buku << endl;
+            cout<< "Tanggal Pinjam : "<< tangglpinjam << endl;
+            cout<< "Status         : "<< status<< endl;
+            cout<< "-------------------------------------------\n";
             ada = true;
 
         }
@@ -1210,11 +1251,29 @@ int main() {
         cout << "2. ANGGOTA\n";
         cout << "0. KELUAR\n";
         cout << "Masukkan pilihan: ";
-        cin >> pilihan1;
+        
+        // VALIDASI LOGIN
+while (true) {
+    cin >> pilihan1;
+
+    if (cin.fail()) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Input harus angka (0-2). Masukkan ulang: ";
+        continue;
+    }
+
+    if (pilihan1 < 0 || pilihan1 > 2) {
+        cout << "Pilihan tidak valid (0-2). Masukkan ulang: ";
+        continue;
+    }
+
+    break;
+}
 
         if (pilihan1 == 1) {
 
-           loginPetugas();
+          loginPetugas();
             int pilihan;
 
             do {
@@ -1226,7 +1285,25 @@ int main() {
                 cout << "5. Keluar\n";
                 cout << "=====================================\n";
                 cout << "Pilih Menu (1-5): ";
-                cin >> pilihan;
+                
+                // VALIDASI MENU UTAMA PETUGAS
+        while (true) {
+            cin >> pilihan;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Input harus angka (0-5). Masukkan ulang: ";
+                continue;
+            }
+
+            if (pilihan < 1 || pilihan > 5) {
+                cout << "Pilihan tidak valid (0-5). Masukkan ulang: ";
+                continue;
+            }
+
+            break;
+        }
 
                 switch(pilihan) {
                                     //================ MENUPETUGAS ================
@@ -1238,7 +1315,26 @@ int main() {
                         cout << "2. Tampil Petugas\n";
                         cout << "0. Kembali\n";
                         cout << "Pilihan: ";
-                        cin >> p2;
+// VALIDASI INPUT p2
+        while (true) {
+            cin >> p2;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Input harus angka (0-2). Masukkan ulang: ";
+                continue;
+            }
+
+            if (p2 < 0 || p2 > 2) {
+                cout << "Pilihan tidak valid (0-2). Masukkan ulang: ";
+                continue;
+            }
+
+            break;
+        }
+
+
 
                         switch(p2) {
                             case 1: TambahPetugas(); break;
@@ -1246,6 +1342,8 @@ int main() {
                             case 0: cout << "Kembali ke menu utama...\n"; break;
                             default: cout << "Pilihan tidak valid!\n";
                         }
+
+
                     } while(p2 != 0);
                     break;
                 }
@@ -1258,7 +1356,25 @@ int main() {
                         cout << "3. Cari Anggota\n";
                         cout << "0. Kembali\n";
                         cout << "Pilihan: ";
-                        cin >> p2;
+                        // VALIDASI INPUT p2
+        while (true) {
+            cin >> p2;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Input harus angka (0-3). Masukkan ulang: ";
+                continue;
+            }
+
+            if (p2 < 0 || p2 > 3) {
+                cout << "Pilihan tidak valid (0-3). Masukkan ulang: ";
+                continue;
+            }
+
+            break;
+        }
+
 
                         switch(p2) {
                             case 1: TambahAnggota(); break;
@@ -1283,7 +1399,26 @@ int main() {
                         cout << "5. Update Stok\n";
                         cout << "0. Kembali\n";
                         cout << "Pilihan: ";
-                        cin >> p2;
+                         // VALIDASI INPUT p2
+        while (true) {
+            cin >> p2;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Input harus angka (0-5). Masukkan ulang: ";
+                continue;
+            }
+
+            if (p2 < 0 || p2 > 5) {
+                cout << "Pilihan tidak valid (0-5). Masukkan ulang: ";
+                continue;
+            }
+
+            break;
+        }
+
+
 
                         switch(p2) {
                             case 1: TambahBuku(); break;
@@ -1309,7 +1444,26 @@ int main() {
                         cout << "4. Tampil Buku Yang Belum Dikembalikan\n";
                         cout << "0. Kembali\n";
                         cout << "Pilihan: ";
-                        cin >> p2;
+                         // VALIDASI INPUT p2
+        while (true) {
+            cin >> p2;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Input harus angka (0-4). Masukkan ulang: ";
+                continue;
+            }
+
+            if (p2 < 0 || p2 > 4) {
+                cout << "Pilihan tidak valid (0-4). Masukkan ulang: ";
+                continue;
+            }
+
+            break;
+        }
+
+
 
                         switch(p2) {
                             case 1: pinjamBuku(); break;
