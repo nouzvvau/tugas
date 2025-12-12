@@ -296,32 +296,25 @@ int getLastIDAnggota() {
 }
 
 bool validTanggal(const string &ttl) {
-    // Cari bagian tanggal setelah koma
     size_t pos = ttl.find(",");
     if (pos == string::npos) return false;
 
-    string tgl = ttl.substr(pos + 2); // ambil bagian YYYY-MM-DD
-
-    // Format harus tepat 10 karakter
+    string tgl = ttl.substr(pos + 2);
+    
     if (tgl.length() != 10) return false;
     if (tgl[4] != '-' || tgl[7] != '-') return false;
 
-    // Ambil angka
     int tahun  = stoi(tgl.substr(0, 4));
     int bulan  = stoi(tgl.substr(5, 2));
     int hari   = stoi(tgl.substr(8, 2));
 
-    // Validasi bulan
     if (bulan < 1 || bulan > 12) return false;
 
-    // Jumlah hari tiap bulan
     int hariPerBulan[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    // Cek tahun kabisat → Februari = 29
     bool kabisat = (tahun % 4 == 0 && tahun % 100 != 0) || (tahun % 400 == 0);
     if (kabisat) hariPerBulan[1] = 29;
 
-    // Validasi hari
     if (hari < 1 || hari > hariPerBulan[bulan - 1]) return false;
 
     return true;
